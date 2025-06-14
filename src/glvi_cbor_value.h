@@ -123,6 +123,10 @@ public:
     }
   }
 
+  /**
+     If the CBOR value holds a byte string, returns a copy of that
+     byte string; otherwise, returns an empty optional.
+   */
   auto as_bstr() const noexcept -> std::optional<CBORBstr> {
     using type = CBORBstr;
     if (std::holds_alternative<type>(storage)) {
@@ -132,6 +136,10 @@ public:
     }
   }
 
+  /**
+     If the CBOR value holds a byte string, returns a reference to
+     that byte string; otherwise, returns an empty optional.
+   */
   auto as_bstr_ref() noexcept -> std::optional<std::reference_wrapper<CBORBstr>> {
     using type = CBORBstr;
     if (std::holds_alternative<type>(storage)) {
@@ -141,6 +149,11 @@ public:
     }
   }
 
+  /**
+     If the CBOR value holds a byte string, returns a constant
+     reference to that byte string; otherwise, returns an empty
+     optional.
+   */
   auto as_bstr_cref() const noexcept -> std::optional<std::reference_wrapper<CBORBstr const>> {
     using type = CBORBstr;
     if (std::holds_alternative<type>(storage)) {
@@ -150,11 +163,20 @@ public:
     }
   }
 
-  auto move_bstr(CBORBstr& target) {
+  /**
+     If the CBOR value holds a byte string, moves that byte string
+     into the specified `target`; otherwise, does nothing.
+
+     @return `true` if the byte string was moved; `false` otherwise.
+   */
+  auto move_bstr(CBORBstr& target) -> bool {
     using type = CBORBstr;
     if (std::holds_alternative<type>(storage)) {
       std::exchange(target, std::get<type>(storage));
       *this = CBOR_Undefined;
+      return true;
+    } else {
+      return false;
     }
   }
 };

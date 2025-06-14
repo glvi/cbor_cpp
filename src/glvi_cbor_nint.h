@@ -52,7 +52,7 @@ public:
   constexpr explicit operator CBOR_U64() const noexcept { return value; }
 
   /**
-     Compares two CBOR unsigned integers.
+     Compares two CBOR negative integers.
    */
   friend constexpr std::strong_ordering operator<=>(CBORNint const &,
 						    CBORNint const &) = default;

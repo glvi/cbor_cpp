@@ -11,7 +11,10 @@ libglvi_cbor_la_SOURCES = \
     glvi_cbor_bstr.cpp \
     glvi_cbor_tstr.cpp \
     glvi_cbor_array.cpp \
+    glvi_cbor_map.cpp \
     glvi_cbor_tag.cpp \
+    glvi_cbor_simple.cpp \
+    glvi_cbor_float.cpp \
     glvi_cbor_value.cpp \
     $(libglvi_cbor_la_HEADERS)
 

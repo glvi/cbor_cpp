@@ -30,17 +30,6 @@ static_assert(std::is_constructible_v<Self, Self::storage_type const&>);
 static_assert(Self().size() == 0);
 
 [[maybe_unused]]
-static void dummy2() {
-  CBORBstr _ { std::vector {
-      std::byte {0x01},
-      std::byte {0x02},
-      std::byte {0x03},
-      std::byte {0x04},
-    },
-  };
-}
-
-[[maybe_unused]]
 char const *_glvi_cbor_bstr() {
   return "GLVI CBOR BSTR";
 }

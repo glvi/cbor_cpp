@@ -14,21 +14,8 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
-#include "glvi_cbor_tag.h"
-#include "glvi_cbor_value.h"
+#include "glvi_cbor_simple.h"
 
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORValue>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORUint>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORNint>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORBstr>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORTstr>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORArray>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORMap>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORTag>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORSimple>);
-static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORFloat>);
-
-[[maybe_unused]]
-char const *_glvi_cbor_tag() {
-  return "GLVI CBOR TAG";
+char const * _glvi_cbor_simple() {
+  return "GLVI CBOR SIMPLE";
 }
