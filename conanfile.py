@@ -14,11 +14,11 @@ class glvi_cborConan(ConanFile):
     win_bash = True
 
     # Optional metadata
-    license = "<Put the package license here>"
-    author = "<Put your name here> <And your email here>"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of {package_name} here>"
-    topics = ("<Put some tag here>", "<here>", "<and here>")
+    license = "GPL-3.0-or-later"
+    author = "Kai Lothar John (l.john@glvi.de)"
+    url = "https://github.com/glvi/cbor_cpp"
+    description = "Utilities for decoding Concise Binary Object Notation"
+    topics = ("cbor")
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
