@@ -11,6 +11,7 @@ class glvi_cborConan(ConanFile):
     name = "glvi_cbor"
     version = "0.1"
     package_type = "library"
+    vendor = "GLVI Gesellschaft für Luftverkehrsinformatik mbH"
     win_bash = True
 
     # Optional metadata
@@ -47,6 +48,7 @@ class glvi_cborConan(ConanFile):
         autotools.autoreconf()
         autotools.configure()
         autotools.make()
+        autotools.make("check")
 
     def package(self):
         autotools = Autotools(self)
