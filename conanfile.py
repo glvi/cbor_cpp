@@ -40,6 +40,9 @@ class glvi_cborConan(ConanFile):
 
     def generate(self):
         at_toolchain = AutotoolsToolchain(self)
+        at_toolchain.update_configure_args({
+            "--prefix": None ## Deals with the issue that CONAN sets prefix to / by default
+        })
         at_toolchain.generate()
 
     def build(self):
