@@ -1,14 +1,15 @@
+# -*- mode: yaml; coding: utf-8-unix; -*-
 If:
-    PathMatch: .*\.h
+  PathMatch: .*\.h
 
-CompileFlags:
+  CompileFlags:
     Add: [-xc++-header, -std=c++23]
 
 ---
 If:
-    PathMatch: .*\.cpp
+  PathMatch: .*\.cpp
 
-CompileFlags:
+  CompileFlags:
     Add: [-xc++, -std=c++23]
 
 ---
