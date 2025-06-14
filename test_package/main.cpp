@@ -1,4 +1,4 @@
-#include "glvi_cbor.hh"
+#include "glvi_cbor.h"
 #include <vector>
 #include <string>
 
