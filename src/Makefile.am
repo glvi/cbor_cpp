@@ -5,6 +5,7 @@ lib_LTLIBRARIES = libglvi_cbor.la
 
 libglvi_cbor_la_SOURCES = \
     glvi_cbor.cpp \
+    glvi_cbor_u64.cpp \
     glvi_cbor_uint.cpp \
     glvi_cbor_nint.cpp \
     glvi_cbor_bstr.cpp \

@@ -59,24 +59,7 @@ public:
      Converts a CBOR U64 to a value_type
    */
   constexpr explicit operator value_type() const noexcept { return value; }
-
-  /**
-     Static asssertions
-   */
-  static constexpr void sassert();
 };
-
-constexpr void CBOR_U64::sassert() {
-  static_assert(sizeof(CBOR_U64) == 8);
-  static_assert(CBOR_U64().value == 0);
-  static_assert(CBOR_U64(0u).value == 0);
-  static_assert(CBOR_U64(1u).value == 1);
-  static_assert(not std::constructible_from<CBOR_U64, signed char>);
-  static_assert(not std::constructible_from<CBOR_U64, signed short>);
-  static_assert(not std::constructible_from<CBOR_U64, signed int>);
-  static_assert(not std::constructible_from<CBOR_U64, signed long>);
-  static_assert(not std::constructible_from<CBOR_U64, signed long long>);
-}
 
 /**
    CBOR U64 literal
