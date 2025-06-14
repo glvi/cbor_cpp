@@ -18,3 +18,8 @@
 #include "glvi_cbor_value.h"
 
 auto CBORArray::size() noexcept -> size_type { return elements.size(); }
+
+[[maybe_unused]]
+char const *_glvi_cbor_array() {
+  return "GLVI CBOR ARRAY";
+}

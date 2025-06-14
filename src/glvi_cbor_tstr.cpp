@@ -25,3 +25,8 @@ static_assert(std::is_copy_assignable_v<CBORTstr>);
 
 static_assert(CBORTstr().size() == 0);
 static_assert(CBORTstr{}.size() == 0);
+
+[[maybe_unused]]
+char const *_glvi_cbor_tstr() {
+  return "GLVI CBOR TSTR";
+}

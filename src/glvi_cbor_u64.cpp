@@ -45,3 +45,8 @@ static_assert(0_cbor <= 1_cbor);
 static_assert(0_cbor < 1_cbor);
 static_assert(1_cbor > 0_cbor);
 static_assert(1_cbor >= 0_cbor);
+
+[[maybe_unused]]
+char const *_glvi_cbor_u64() {
+  return "GLVI CBOR U64";
+}

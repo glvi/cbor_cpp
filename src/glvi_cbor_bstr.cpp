@@ -39,3 +39,8 @@ static void dummy2() {
     },
   };
 }
+
+[[maybe_unused]]
+char const *_glvi_cbor_bstr() {
+  return "GLVI CBOR BSTR";
+}

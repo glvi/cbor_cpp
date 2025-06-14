@@ -61,3 +61,8 @@ static void dummy() {
     (void) *opt;
   }
 }
+
+[[maybe_unused]]
+char const *_glvi_cbor_value() {
+  return "GLVI CBOR VALUE";
+}

@@ -19,3 +19,8 @@
 
 static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORValue>);
 static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORUint>);
+
+[[maybe_unused]]
+char const *_glvi_cbor_tag() {
+  return "GLVI CBOR TAG";
+}

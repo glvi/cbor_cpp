@@ -25,3 +25,8 @@ static_assert(not std::is_constructible_v<Self, unsigned>);
 static_assert(not std::is_constructible_v<Self, signed>);
 static_assert(Self() == Self(0_cbor));
 static_assert(Self(1_cbor) != Self(0_cbor));
+
+[[maybe_unused]]
+char const *_glvi_cbor_uint() {
+  return "GLVI CBOR UINT";
+}
