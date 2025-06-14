@@ -15,10 +15,29 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
-#include "glvi_cbor_value.hh"
-
-#include <string>
+#include "glvi_cbor_u64.h"
+#include <cstddef>
 #include <vector>
 
-void glvi_cbor();
-void glvi_cbor_print_vector(const std::vector<std::string> &strings);
+struct CBORValue;
+
+/**
+   CBOR major type 5: Map of pairs of CBOR values.
+ */
+class CBORMap {
+  using Self = CBORMap;
+
+public:
+  using storage_type = std::vector<CBORValue>;
+  using value_type = storage_type::value_type;
+  using size_type = storage_type::size_type;
+
+  CBORMap() = default;
+  CBORMap(CBORMap&&) = default;
+  CBORMap(CBORMap const&) = default;
+  CBORMap& operator=(CBORMap&&) = default;
+  CBORMap& operator=(CBORMap const&) = default;
+
+private:
+  storage_type entries;
+};

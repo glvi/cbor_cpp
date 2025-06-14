@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
-#include "glvi_cbor_u64.hh"
+#include "glvi_cbor_u64.h"
 #include <memory>
 #include <type_traits>
 

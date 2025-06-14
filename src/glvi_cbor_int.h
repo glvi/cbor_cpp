@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
-#include "glvi_cbor_uint.hh"
-#include "glvi_cbor_nint.hh"
+#include "glvi_cbor_uint.h"
+#include "glvi_cbor_nint.h"
 #include <type_traits>
 #include <variant>
 

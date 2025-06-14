@@ -14,7 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
-#include "glvi_cbor_array.hh"
-#include "glvi_cbor_value.hh"
+#include "glvi_cbor_array.h"
+#include "glvi_cbor_value.h"
 
 auto CBORArray::size() noexcept -> size_type { return elements.size(); }

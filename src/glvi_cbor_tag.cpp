@@ -14,8 +14,8 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
-#include "glvi_cbor_tag.hh"
-#include "glvi_cbor_value.hh"
+#include "glvi_cbor_tag.h"
+#include "glvi_cbor_value.h"
 
 static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORValue>);
 static_assert(std::is_constructible_v<CBORTag, CBOR_U64, CBORUint>);

@@ -1,4 +1,4 @@
-#include "glvi_cbor.hh"
+#include "glvi_cbor.h"
 #include <iostream>
 
 void glvi_cbor() {

@@ -15,15 +15,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
-#include "glvi_cbor_array.hh"
-#include "glvi_cbor_bstr.hh"
-#include "glvi_cbor_float.hh"
-#include "glvi_cbor_map.hh"
-#include "glvi_cbor_nint.hh"
-#include "glvi_cbor_simple.hh"
-#include "glvi_cbor_tag.hh"
-#include "glvi_cbor_tstr.hh"
-#include "glvi_cbor_uint.hh"
+#include "glvi_cbor_array.h"
+#include "glvi_cbor_bstr.h"
+#include "glvi_cbor_float.h"
+#include "glvi_cbor_map.h"
+#include "glvi_cbor_nint.h"
+#include "glvi_cbor_simple.h"
+#include "glvi_cbor_tag.h"
+#include "glvi_cbor_tstr.h"
+#include "glvi_cbor_uint.h"
 #include <functional>
 #include <optional>
 #include <variant>

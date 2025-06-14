@@ -15,19 +15,19 @@ libglvi_cbor_la_SOURCES = \
     $(libglvi_cbor_la_HEADERS)
 
 libglvi_cbor_la_HEADERS = \
-    glvi_cbor.hh \
-    glvi_cbor_u64.hh \
-    glvi_cbor_uint.hh \
-    glvi_cbor_nint.hh \
-    glvi_cbor_int.hh \
-    glvi_cbor_bstr.hh \
-    glvi_cbor_tstr.hh \
-    glvi_cbor_array.hh \
-    glvi_cbor_map.hh \
-    glvi_cbor_tag.hh \
-    glvi_cbor_simple.hh \
-    glvi_cbor_float.hh \
-    glvi_cbor_value.hh
+    glvi_cbor.h \
+    glvi_cbor_u64.h \
+    glvi_cbor_uint.h \
+    glvi_cbor_nint.h \
+    glvi_cbor_int.h \
+    glvi_cbor_bstr.h \
+    glvi_cbor_tstr.h \
+    glvi_cbor_array.h \
+    glvi_cbor_map.h \
+    glvi_cbor_tag.h \
+    glvi_cbor_simple.h \
+    glvi_cbor_float.h \
+    glvi_cbor_value.h
 
 libglvi_cbor_ladir = $(includedir)
 

@@ -14,7 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
-#include "glvi_cbor_tstr.hh"
+#include "glvi_cbor_tstr.h"
 #include <type_traits>
 
 static_assert(std::is_nothrow_default_constructible_v<CBORTstr>);
