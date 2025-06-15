@@ -1,5 +1,5 @@
 //  -*- mode: c++; coding: utf-8-unix; -*-
-//  cbor: Utilities for decoding Concise Binary Object Notation
+//  cbor: Utilities for decoding Concise Binary Object Representation
 //  Copyright (C) 2025 GLVI Gesellschaft für Luftverkehrsinformatik mbH.
 //
 //  This program is free software: you can redistribute it and/or modify
