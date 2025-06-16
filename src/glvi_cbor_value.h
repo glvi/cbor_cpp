@@ -27,6 +27,7 @@
 #include "glvi_cbor_uint.h"
 #include <optional>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 /**
