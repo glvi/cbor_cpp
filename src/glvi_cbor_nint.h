@@ -16,6 +16,7 @@
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 #include "glvi_cbor_u64.h"
+#include <utility>
 
 /**
    CBOR major type 1: Negative integers in the range -2^64 .. -1.
