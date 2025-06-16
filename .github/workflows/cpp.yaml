@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install DejaGNU
+      run: apt-get install dejagnu
     - name: Initialize GNU build system
       run: |
         autoreconf -f -i -s
