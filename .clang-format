@@ -1,1 +1,8 @@
+AlignConsecutiveShortCaseStatements:
+  AcrossComments: true
+  AcrossEmptyLines: true
+  AlignCaseColons: true
+  Enabled: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
 ReferenceAlignment: Left
