@@ -15,7 +15,6 @@ dnl General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU General Public License
 dnl along with this program. If not, see <https://www.gnu.org/licenses/>.
-AC_PREREQ([2.72])
 AC_INIT([glvi_cbor], [0.1], [info@glvi.de])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_PROG_CXX
