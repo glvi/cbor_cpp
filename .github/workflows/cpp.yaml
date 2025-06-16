@@ -15,14 +15,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Initialize GNU build system
-      run: autoreconf -f -i -s
+      run: |
+        autoreconf -f -i -s
+        mkdir build
     - name: Create build configuration
       working-directory: build
       run: |
         ../configure
     - name: Build
-      run: make
-      working-directory: build
+      run: make -C build
     - name: Tests
-      run: make check
-      working-directory: build
+      run: make -C build check
