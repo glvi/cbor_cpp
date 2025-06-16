@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
     - name: Install DejaGNU
       run: sudo apt-get install dejagnu
+    - uses: actions/checkout@v3
     - name: Initialize GNU build system
       run: |
         autoreconf -f -i -s
