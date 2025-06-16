@@ -15,18 +15,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
-#include "glvi_cbor_u64.h"
-#include <initializer_list>
-#include <vector>
+#include <string>
 
 /**
    CBOR major type 2: Byte strings (length < 2^64).
  */
 class CBORTstr {
 public:
-  using value_type = std::byte;
-
-  using storage_type = std::vector<value_type>;
+  using storage_type = std::u8string;
 
 private:
   storage_type storage;
@@ -40,24 +36,35 @@ public:
   explicit CBORTstr() = default;
 
   /**
-     Constructs a CBOR text string from a list of bytes.
+     Move-constructs a CBOR text string from a C++ UTF-8 string.
    */
-  explicit CBORTstr(std::initializer_list<std::byte> ilist) noexcept : storage(ilist) {}
+  explicit CBORTstr(storage_type&& other) : storage(std::move(other)) {}
 
   /**
-     Move-constructs a CBOR text string from a vector of bytes.
+     Copy-constructs a CBOR text string from a C++ UTF-8 string.
    */
-  explicit CBORTstr(storage_type &&other) : storage(std::move(other)) {}
+  explicit CBORTstr(storage_type const& other) : storage(other) {}
 
   /**
-     Copy-constructs a CBOR text string from a vector of bytes.
+     Move-assigns a CBOR text string from a C++ UTF-8 string.
+  */
+  CBORTstr& operator=(storage_type&& other) {
+    storage = std::move(other);
+    return *this;
+  }
+
+  /**
+     Copy-assigns a CBOR text string from a C++ UTF-8 string.
    */
-  explicit CBORTstr(storage_type const &other) : storage(other) {}
+  CBORTstr& operator=(storage_type const& other) {
+    storage = other;
+    return *this;
+  }
 
   /**
      Returns the number of bytes in the text string.
    */
-  constexpr auto size() noexcept { return storage.size(); }
+  constexpr auto size() const noexcept { return storage.size(); }
 
   /**
      Returns the byte at index `i` from the byte string
@@ -67,12 +74,47 @@ public:
   /**
      Returns the byte at index `i`
    */
-  auto operator[](size_type const i) const noexcept {
-    return storage[i];
-  }
+  auto operator[](size_type const i) const noexcept { return storage[i]; }
 
   /**
      Returns a reference to the byte at index `i`
    */
-  auto &operator[](size_type const i) noexcept { return storage[i]; }
+  auto& operator[](size_type const i) noexcept { return storage[i]; }
+
+  /**
+     Compares two CBOR text strings
+   */
+  friend constexpr auto operator<=>(CBORTstr const& a,
+                                    CBORTstr const& b) noexcept = default;
+
+  /**
+     Compares a CBOR text string with a C++ UTF-8 string
+   */
+  friend constexpr auto operator<=>(CBORTstr const& a,
+                                    storage_type const& b) noexcept {
+    return a.storage <=> b;
+  }
+
+  /**
+     Compares a C++ UTF-8 string with a CBOR text string
+   */
+  friend constexpr auto operator<=>(storage_type const& a,
+                                    CBORTstr const& b) noexcept {
+    return a <=> b.storage;
+  }
+
+  friend constexpr bool operator==(CBORTstr const& a,
+                                   std::u8string const& b) noexcept {
+    return a <=> b == 0;
+  }
+
+  friend constexpr bool operator==(std::u8string const& a,
+                                   CBORTstr const& b) noexcept {
+    return a <=> b == 0;
+  }
 };
+
+constexpr CBORTstr operator""_cbor_tstr(char8_t const *const s,
+                                        unsigned long const n) {
+  return CBORTstr(std::u8string(s, n));
+}

@@ -37,10 +37,13 @@ libglvi_cbor_ladir = $(includedir)
 
 check_PROGRAMS = \
     glvi_cbor_bstr_tests \
-    glvi_cbor_tstr_tests
+    glvi_cbor_tstr_tests \
+    glvi_cbor_value_tests
 
-glvi_cbor_bstr_tests_SOURCES = glvi_cbor_bstr_tests.cpp
+glvi_cbor_bstr_tests_LDADD = -lglvi_cbor
+glvi_cbor_tstr_tests_LDADD = -lglvi_cbor
+glvi_cbor_value_tests_LDADD = -lglvi_cbor
 
-glvi_cbor_tstr_tests_SOURCES = glvi_cbor_tstr_tests.cpp
+AM_DEFAULT_SOURCE_EXT = .cpp
 
 TESTS = $(check_PROGRAMS)

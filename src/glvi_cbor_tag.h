@@ -50,7 +50,7 @@ public:
     , storage(std::make_shared<value_type>(std::move(v)))
   {}
 
-  CBOR_U64 tag() noexcept { return number; }
+  CBOR_U64 tag() const noexcept { return number; }
 
   auto& value() noexcept { return *storage; }
 

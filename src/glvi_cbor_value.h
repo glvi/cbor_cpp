@@ -23,9 +23,10 @@
 #include "glvi_cbor_simple.h"
 #include "glvi_cbor_tag.h"
 #include "glvi_cbor_tstr.h"
+#include "glvi_cbor_u64.h"
 #include "glvi_cbor_uint.h"
-#include <functional>
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 /**
@@ -54,9 +55,9 @@ public:
      @param value of `Type`
    */
   template <typename Type>
-    requires std::constructible_from<storage_type, Type &&>
-  constexpr CBORValue(Type &&value) noexcept(
-      noexcept(storage_type(std::move(value))))
+    requires std::constructible_from<storage_type, Type&&>
+  constexpr CBORValue(Type&& value) noexcept(
+      std::is_nothrow_constructible_v<storage_type, Type&&>)
       : storage(std::move(value)) {}
 
   /**
@@ -65,8 +66,9 @@ public:
      @param value of `Type`
    */
   template <typename Type>
-    requires std::constructible_from<storage_type, Type const &>
-  constexpr CBORValue(Type const &value) noexcept(noexcept(storage_type(value)))
+    requires std::constructible_from<storage_type, Type const&>
+  constexpr CBORValue(Type const& value) noexcept(
+      std::is_nothrow_constructible_v<storage_type, Type const&>)
       : storage(value) {}
 
   constexpr auto is_uint() const noexcept {
@@ -140,7 +142,8 @@ public:
      If the CBOR value holds a byte string, returns a reference to
      that byte string; otherwise, returns an empty optional.
    */
-  auto as_bstr_ref() noexcept -> std::optional<std::reference_wrapper<CBORBstr>> {
+  auto as_bstr_ref() noexcept
+      -> std::optional<std::reference_wrapper<CBORBstr>> {
     using type = CBORBstr;
     if (std::holds_alternative<type>(storage)) {
       return std::ref(std::get<type>(storage));
@@ -154,7 +157,8 @@ public:
      reference to that byte string; otherwise, returns an empty
      optional.
    */
-  auto as_bstr_cref() const noexcept -> std::optional<std::reference_wrapper<CBORBstr const>> {
+  auto as_bstr_cref() const noexcept
+      -> std::optional<std::reference_wrapper<CBORBstr const>> {
     using type = CBORBstr;
     if (std::holds_alternative<type>(storage)) {
       return std::cref(std::get<type>(storage));
@@ -179,4 +183,98 @@ public:
       return false;
     }
   }
+
+  /**
+     If the CBOR value holds a text string, returns a copy of that
+     text string; otherwise, returns an empty optional.
+   */
+  auto as_tstr() const noexcept -> std::optional<CBORTstr> {
+    using type = CBORTstr;
+    if (std::holds_alternative<type>(storage)) {
+      return std::get<type>(storage);
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  /**
+     If the CBOR value holds a text string, returns a reference to
+     that text string; otherwise, returns an empty optional.
+   */
+  auto as_tstr_ref() noexcept
+      -> std::optional<std::reference_wrapper<CBORTstr>> {
+    using type = CBORTstr;
+    if (std::holds_alternative<type>(storage)) {
+      return std::ref(std::get<type>(storage));
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  /**
+     If the CBOR value holds a text string, returns a constant
+     reference to that text string; otherwise, returns an empty
+     optional.
+   */
+  auto as_tstr_cref() const noexcept
+      -> std::optional<std::reference_wrapper<CBORTstr const>> {
+    using type = CBORTstr;
+    if (std::holds_alternative<type>(storage)) {
+      return std::cref(std::get<type>(storage));
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  /**
+     If the CBOR value holds a text string, moves that text string
+     into the specified `target`; otherwise, does nothing.
+
+     @return `true` if the text string was moved; `false` otherwise.
+   */
+  auto move_tstr(CBORTstr& target) -> bool {
+    using type = CBORTstr;
+    if (std::holds_alternative<type>(storage)) {
+      std::exchange(target, std::get<type>(storage));
+      *this = CBOR_Undefined;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+     If the CBOR value holds a tag, returns a copy of that
+     tag; otherwise, returns an empty optional.
+   */
+  auto as_tag() const noexcept -> std::optional<CBORTag> {
+    using type = CBORTag;
+    if (std::holds_alternative<type>(storage)) {
+      return std::get<type>(storage);
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  auto as_tag_ref() noexcept
+      -> std::optional<std::reference_wrapper<CBORTag>> {
+    using type = CBORTag;
+    if (std::holds_alternative<type>(storage)) {
+      return std::ref(std::get<type>(storage));
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  auto as_tag_cref() const noexcept
+      -> std::optional<std::reference_wrapper<CBORTag const>> {
+    using type = CBORTag;
+    if (std::holds_alternative<type>(storage)) {
+      return std::cref(std::get<type>(storage));
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  auto move_tag(CBORTag& target) noexcept -> bool;
 };

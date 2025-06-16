@@ -14,7 +14,8 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
-#include "glvi_cbor_tstr.h"
+#include "glvi_cbor_simple.h"
+#include "glvi_cbor_value.h"
 #include <dejagnu.h>
 #include <source_location>
 
@@ -22,7 +23,7 @@ using namespace std::string_literals;
 
 #define TEST_CASE(name) auto test_##name() noexcept try
 
-class CBORTstrTests : TestState, std::source_location {
+class CBORValueTests : TestState, std::source_location {
   unsigned numFailed_ = 0;
 
   void fail(std::string msg) {
@@ -34,10 +35,17 @@ public:
   inline auto success() const noexcept { return numFailed_ == 0; }
   inline auto failure() const noexcept { return numFailed_ > 0; }
 
-  TEST_CASE(direct_init) {
-    CBORTstr x{};
-    if (x.size() == 0) {
-      return pass(current().function_name());
+  TEST_CASE(construct_tag) {
+    CBORValue x = CBORTag(0_cbor, u8"foo"_cbor_tstr);
+    if (auto const &opt_tag = x.as_tag_cref()) {
+      auto const &tag = opt_tag->get();
+      if (tag.tag() == 0_cbor) {
+	if (auto const& opt_tstr = tag.value().as_tstr_cref()) {
+	  auto const& tstr = opt_tstr->get();
+	  if (tstr == u8"foo"s)
+	    return pass(current().function_name());
+	}
+      }
     }
     return fail(current().function_name());
   }
@@ -45,60 +53,27 @@ public:
     return fail(current().function_name());
   }
 
-  TEST_CASE(string_init) {
-    CBORTstr x {u8"12"s};
-    if (x.size() == 2 and x.at(0) == '1' and x.at(1) == '2') {
-      return pass(current().function_name());
+  TEST_CASE(move_tag) {
+    CBORValue x = CBORTag(1_cbor, u8"foo"_cbor_tstr);
+    CBORTag y{0_cbor, CBORUint(0_cbor)};
+    x.move_tag(y);
+    if (x.is_simple() and y.tag() == 1_cbor and y.value().is_tstr()) {
+      if (auto const& opt_tstr = y.value().as_tstr_cref()) {
+	auto const& tstr = opt_tstr->get();
+	if (tstr == u8"foo"s) {
+	  return pass(current().function_name());
+	}
+      }
     }
     return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
-  }
-
-  TEST_CASE(vector_init_move) {
-    auto y = u8"12"s;
-    CBORTstr x{std::move(y)};
-    if (y.size() == 0 and x.size() == 2 and x.at(0) == '1' and x.at(1) == '2') {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
-  }
-
-  TEST_CASE(vector_init_copy) {
-    auto y = u8"12"s;
-    CBORTstr x{y};
-    if (y.size() == 2 and x.size() == 2 and x.at(0) == '1' and x.at(1) == '2') {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
-  }
-
-  TEST_CASE(at_out_of_bounds) {
-    CBORTstr x{};
-    x.at(1);
-    return fail(current().function_name());
-  }
-  catch (std::out_of_range&) {
-    return pass(current().function_name());
-  }
-  catch (...) {
+  } catch (...) {
     return fail(current().function_name());
   }
 };
 
 int main(int argc, char *argv[]) {
-  CBORTstrTests testSuite{};
-  testSuite.test_direct_init();
-  testSuite.test_string_init();
-  testSuite.test_vector_init_move();
-  testSuite.test_vector_init_copy();
-  testSuite.test_at_out_of_bounds();
+  CBORValueTests testSuite{};
+  testSuite.test_construct_tag();
+  testSuite.test_move_tag();
   return testSuite.failure();
 }

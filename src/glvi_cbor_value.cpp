@@ -22,25 +22,25 @@ static_assert(std::is_copy_constructible_v<CBORValue>);
 static_assert(std::is_nothrow_move_assignable_v<CBORValue>);
 static_assert(std::is_copy_assignable_v<CBORValue>);
 
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORUint &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORNint &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORBstr &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORTstr &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORArray &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORMap &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORTag &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORSimple &&>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORFloat &&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORUint&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORNint&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORBstr&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORTstr&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORArray&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORMap&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORTag&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORSimple&&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORFloat&&>);
 
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORUint const &>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORNint const &>);
-static_assert(std::is_constructible_v<CBORValue, CBORBstr const &>);
-static_assert(std::is_constructible_v<CBORValue, CBORTstr const &>);
-static_assert(std::is_constructible_v<CBORValue, CBORArray const &>);
-static_assert(std::is_constructible_v<CBORValue, CBORMap const &>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORTag const &>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORSimple const &>);
-static_assert(std::is_nothrow_constructible_v<CBORValue, CBORFloat const &>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORUint const&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORNint const&>);
+static_assert(std::is_constructible_v<CBORValue, CBORBstr const&>);
+static_assert(std::is_constructible_v<CBORValue, CBORTstr const&>);
+static_assert(std::is_constructible_v<CBORValue, CBORArray const&>);
+static_assert(std::is_constructible_v<CBORValue, CBORMap const&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORTag const&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORSimple const&>);
+static_assert(std::is_nothrow_constructible_v<CBORValue, CBORFloat const&>);
 
 static_assert(CBORValue().is_simple());
 static_assert(CBORValue(CBORUint()).is_uint());
@@ -49,16 +49,28 @@ static_assert(CBORValue(CBORBstr()).is_bstr());
 static_assert(CBORValue(CBORTstr()).is_tstr());
 static_assert(CBORValue(CBORArray()).is_array());
 static_assert(CBORValue(CBORMap()).is_map());
-//static_assert(CBORValue(CBORTag(0_cbor, CBORUint())).is_tag());
+// static_assert(CBORValue(CBORTag(0_cbor, CBORUint())).is_tag());
 static_assert(CBORValue(CBORSimple(0)).is_simple());
 static_assert(CBORValue(CBORFloat()).is_float());
+
+auto CBORValue::move_tag(CBORTag& target) noexcept -> bool {
+  using type = CBORTag;
+  if (std::holds_alternative<type>(storage)) {
+    CBORValue tmp{};
+    auto old_storage{std::exchange(storage, tmp.storage)};
+    auto old_target{std::exchange(target, std::get<type>(old_storage))};
+    return true;
+  } else {
+    return false;
+  }
+}
 
 [[maybe_unused]]
 static void dummy() {
   CBORValue x = CBORUint(0_cbor);
-  CBORValue y = CBORBstr { std::byte {0x01}, std::byte {0x02} };
+  CBORValue y = CBORBstr{std::byte{0x01}, std::byte{0x02}};
   if (auto opt = y.as_bstr()) {
-    (void) *opt;
+    (void)*opt;
   }
 }
 
