@@ -26,7 +26,7 @@ dnl information on the package
 AC_INIT([glvi_cbor],
         [0.1],
 	[info@glvi.de],
-	[glvi-cbor-0.1],
+	[glvi-cbor],
 	[https://github.com/glvi/cbor_cpp])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_SRCDIR([src/glvi_cbor.cpp])
