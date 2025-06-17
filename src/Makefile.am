@@ -1,5 +1,5 @@
 
-AUTOMAKE_OPTIONS = dejagnu
+AM_DEFAULT_SOURCE_EXT = .cpp
 
 lib_LTLIBRARIES = libglvi_cbor.la
 
@@ -16,24 +16,7 @@ libglvi_cbor_la_SOURCES = \
     glvi_cbor_simple.cpp \
     glvi_cbor_float.cpp \
     glvi_cbor_value.cpp \
-    $(libglvi_cbor_la_HEADERS)
-
-libglvi_cbor_la_HEADERS = \
-    glvi_cbor.h \
-    glvi_cbor_u64.h \
-    glvi_cbor_uint.h \
-    glvi_cbor_nint.h \
-    glvi_cbor_int.h \
-    glvi_cbor_bstr.h \
-    glvi_cbor_tstr.h \
-    glvi_cbor_array.h \
-    glvi_cbor_map.h \
-    glvi_cbor_tag.h \
-    glvi_cbor_simple.h \
-    glvi_cbor_float.h \
-    glvi_cbor_value.h
-
-libglvi_cbor_ladir = $(includedir)
+    glvi_cbor_scanner.cpp
 
 check_PROGRAMS = \
     glvi_cbor_bstr_tests \
@@ -43,7 +26,5 @@ check_PROGRAMS = \
 glvi_cbor_bstr_tests_LDADD = -lglvi_cbor
 glvi_cbor_tstr_tests_LDADD = -lglvi_cbor
 glvi_cbor_value_tests_LDADD = -lglvi_cbor
-
-AM_DEFAULT_SOURCE_EXT = .cpp
 
 TESTS = $(check_PROGRAMS)

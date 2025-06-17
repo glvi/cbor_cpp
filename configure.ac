@@ -15,16 +15,96 @@ dnl General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU General Public License
 dnl along with this program. If not, see <https://www.gnu.org/licenses/>.
-AC_INIT([glvi_cbor], [0.1], [info@glvi.de])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-: ${CXXFLAGS="-std=c++23"}
+
+dnl ********************************************************************
+dnl Autoconf requirements
+dnl (empty)
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl information on the package
+AC_INIT([glvi_cbor],
+        [0.1],
+	[info@glvi.de],
+	[glvi-cbor-0.1],
+	[https://github.com/glvi/cbor_cpp])
+AC_CONFIG_SRCDIR([src/glvi_cbor.cpp])
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl checks for programs
+AM_INIT_AUTOMAKE([-Wall -Werror dejagnu foreign])
 AC_PROG_CXX
 AM_PROG_AR
 LT_INIT
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl
+dnl checks for libraries
+dnl (empty)
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl checks for header files
+dnl
 AC_CHECK_HEADER_STDBOOL
-AC_C_INLINE
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl Check for DejaGNU
+dnl
+AC_LANG([C++])
+AC_CHECK_HEADERS(
+  [dejagnu.h],,
+  [AC_MSG_WARN([DejaGNU required for `make check'])])
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl
+dnl checks for types
+dnl
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl
+dnl checks for structures
+dnl
+
+dnl Check for std::expected
+AC_LANG([C++])
+AC_MSG_CHECKING([for std::expected])
+AC_COMPILE_IFELSE(
+  [AC_LANG_SOURCE([dnl
+#include <expected>
+auto test_std_expected() -> std::expected<float,int> {
+  return std::unexpected(0);
+}])],
+  [AC_MSG_RESULT(yes)],
+  [AC_MSG_ERROR([C++23 required to compile the sources])])
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl checks for compiler characteristics
+AC_C_INLINE
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl checks for library functions
+dnl (empty)
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl checks for system services
+dnl (empty)
+dnl ********************************************************************
+
+dnl ********************************************************************
+dnl Emit configuration
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
+dnl ********************************************************************
+dnl (end of file)
