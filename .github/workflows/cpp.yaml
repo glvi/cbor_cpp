@@ -18,13 +18,18 @@ jobs:
     - uses: actions/checkout@v3
     - name: Initialize GNU build system
       run: |
-        autoreconf -f -i -s
         mkdir build
+        autoreconf -f -i -s
     - name: Create build configuration
       working-directory: build
-      run: |
-        ../configure
+      run: ../configure
+      env:
+        CXXFLAGS: -std=c++23        
     - name: Build
       run: make -C build
     - name: Tests
       run: make -C build check
+    - name: Distribution 
+      run: make -C build dist
+    - name: Distribution tests
+      run: make -C build distcheck
