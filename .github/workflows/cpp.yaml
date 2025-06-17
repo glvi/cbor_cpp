@@ -33,3 +33,5 @@ jobs:
       run: make -C build dist
     - name: Distribution tests
       run: make -C build distcheck
+      env:
+        CXXFLAGS: -std=c++23
