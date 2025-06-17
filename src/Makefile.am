@@ -40,10 +40,12 @@ libglvi_cbor_la_HEADERS = \
 check_PROGRAMS = \
     glvi_cbor_bstr_tests \
     glvi_cbor_tstr_tests \
-    glvi_cbor_value_tests
+    glvi_cbor_value_tests \
+    glvi_cbor_scanner_tests
 
 glvi_cbor_bstr_tests_LDADD = -lglvi_cbor
 glvi_cbor_tstr_tests_LDADD = -lglvi_cbor
 glvi_cbor_value_tests_LDADD = -lglvi_cbor
+glvi_cbor_scanner_tests_LDADD = -lglvi_cbor
 
 TESTS = $(check_PROGRAMS)
