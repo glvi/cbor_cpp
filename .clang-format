@@ -5,4 +5,5 @@ AlignConsecutiveShortCaseStatements:
   Enabled: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: false
+NamespaceIndentation: All
 ReferenceAlignment: Left
