@@ -28,6 +28,7 @@ AC_INIT([glvi_cbor],
 	[info@glvi.de],
 	[glvi-cbor-0.1],
 	[https://github.com/glvi/cbor_cpp])
+AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_SRCDIR([src/glvi_cbor.cpp])
 dnl ********************************************************************
 
