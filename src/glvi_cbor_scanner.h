@@ -177,7 +177,8 @@ class Token {
   }
 
 public:
-  template <token_type Token> Token(Token token) : token{std::move(token)} {
+  template <token_type TokenType>
+  Token(TokenType token) : token{std::move(token)} {
   }
 
   Token() = delete;
@@ -411,19 +412,32 @@ public:
   }
 };
 
+/**
+   Main scanning operation.
+
+   Given `state`, consumes `byte` and returns one of the following:
+
+   - `scan_result::Incomplete` when more bytes are needed to make a token.
+     The returned value will contain the state to continue from.
+   - `scan_result::Complete` when a complete token is available.
+     The returned value will contain the state to continue from, and the
+   completed token.
+   - `ScanError` when something went wrong.
+     The returned value contains the error that occurred.
+     The state of the scanner is comprised and will be destroyed.
+ */
 auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult;
 
 template <std::input_iterator Iterator, std::sentinel_for<Iterator> Sentinel>
   requires std::same_as<std::uint8_t, typename Iterator::value_type>
 auto consume(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
-  if (first == last)
-    return scan_error::UnexpectedEof{};
-  for (;;) {
+  while (first != last) {
     auto result = ::consume(std::move(state), *first++);
     if (result.is_error() or result.is_complete())
       return result;
     state = std::move(result.as_incomplete().value());
   }
+  return scan_result::Incomplete{std::move(state)};
 }
 
 template <std::ranges::input_range Range>
