@@ -24,7 +24,7 @@ jobs:
       working-directory: build
       run: ../configure
       env:
-        CXX: g++-15
+        CXX: g++-14
         CXXFLAGS: -std=c++23
     - name: Build
       run: make -C build
@@ -35,5 +35,5 @@ jobs:
     - name: Distribution tests
       run: make -C build distcheck
       env:
-        CXX: g++-15
+        CXX: g++-14
         CXXFLAGS: -std=c++23
