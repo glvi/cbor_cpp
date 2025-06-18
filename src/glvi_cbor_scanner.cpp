@@ -170,7 +170,7 @@ auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult {
       case 0x7f           : return token_tstr_indef();
 
       case 0x80           : return token_array_empty();
-      case CASES_0x81_0x97: return gather_bytes(Kind::Array, (byte - 0x80));
+      case CASES_0x81_0x97: return token_array(byte - 0x80);
       case 0x98           : return gather_argument(Kind::Array, ARGC_N1);
       case 0x99           : return gather_argument(Kind::Array, ARGC_N2);
       case 0x9a           : return gather_argument(Kind::Array, ARGC_N4);
@@ -178,7 +178,7 @@ auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult {
       case 0x9f           : return token_array_indef();
 
       case 0xa0           : return token_map_empty();
-      case CASES_0xa1_0xb7: return gather_bytes(Kind::Map, (byte - 0xa0));
+      case CASES_0xa1_0xb7: return token_map(byte - 0xa0);
       case 0xb8           : return gather_argument(Kind::Map, ARGC_N1);
       case 0xb9           : return gather_argument(Kind::Map, ARGC_N2);
       case 0xba           : return gather_argument(Kind::Map, ARGC_N4);
