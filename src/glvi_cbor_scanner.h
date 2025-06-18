@@ -435,7 +435,7 @@ auto consume(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
     auto result = ::consume(std::move(state), *first++);
     if (result.is_error() or result.is_complete())
       return result;
-    state = std::move(result.as_incomplete().value());
+    state = result.as_incomplete().value();
   }
   return scan_result::Incomplete{std::move(state)};
 }
