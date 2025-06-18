@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: aminya/setup-cpp@v0.28.0
       with:
-        gcc: 15
+        gcc: 14
     - name: Install DejaGNU
       run: sudo apt-get install dejagnu
     - uses: actions/checkout@v3
