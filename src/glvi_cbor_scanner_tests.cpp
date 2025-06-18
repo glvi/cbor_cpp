@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include "glvi_cbor_scanner.h"
+#include <cstdint>
 #include <dejagnu.h>
 #include <source_location>
-#include <variant>
 
 using namespace std::string_literals;
 
@@ -40,17 +40,10 @@ public:
   }
 
   TEST_CASE(decode_uint) {
-    ScanState scanState;
-    auto scanResult = consume(std::move(scanState), 0x01);
-    if (std::holds_alternative<scan_result::Complete>(scanResult)) {
-      auto& complete = std::get<scan_result::Complete>(scanResult);
-      scanState = std::move(complete.state);
-      if (std::holds_alternative<token::Uint>(complete.token)) {
-        auto& uintToken = std::get<token::Uint>(complete.token);
-        if (uintToken.value == 0x01) {
-          return pass(current().function_name());
-        }
-      }
+    auto result = consume(ScanState{}, 0x01);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_uint().value() == 0x01) {
+      return pass(current().function_name());
     }
     return fail(current().function_name());
   }
@@ -59,17 +52,143 @@ public:
   }
 
   TEST_CASE(decode_nint) {
-    ScanState state;
-    auto result = consume(std::move(state), 0x21);
-    if (std::holds_alternative<scan_result::Complete>(result)) {
-      auto& complete = std::get<scan_result::Complete>(result);
-      state = std::move(complete.state);
-      if (std::holds_alternative<token::Nint>(complete.token)) {
-        auto& token = std::get<token::Nint>(complete.token);
-        if (token.value == 0x01) {
-          return pass(current().function_name());
-        }
-      }
+    auto result = consume(ScanState{}, 0x21);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_nint().value() == 0x01) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_bstrx) {
+    auto result = consume(ScanState{}, 0x5f);
+    auto [_, token] = result.as_complete().value();
+    if (token.is_bstrx()) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_bstr0) {
+    auto result = consume(ScanState{}, 0x40);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_bstr().value() == std::vector<std::byte>{}) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_bstr) {
+    std::vector<std::uint8_t> test_vector{0x41, 0x01};
+    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
+    if (token.as_bstr().value() == std::vector{std::byte{0x01}}) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_tstrx) {
+    auto result = consume(ScanState{}, 0x7f);
+    auto [_, token] = result.as_complete().value();
+    if (token.is_tstrx()) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_tstr0) {
+    auto result = consume(ScanState{}, 0x60);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_tstr().value() == std::vector<std::byte>{}) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_tstr) {
+    std::vector<std::uint8_t> test_vector{0x61, 0x01};
+    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
+    if (token.as_tstr().value() == std::vector{std::byte{0x01}}) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_arrayx) {
+    auto result = consume(ScanState{}, 0x9f);
+    auto [_, token] = result.as_complete().value();
+    if (token.is_arrayx()) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_array0) {
+    auto result = consume(ScanState{}, 0x80);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_array().value() == 0x00) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_array) {
+    std::vector<std::uint8_t> test_vector{0x81, 0x01};
+    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
+    if (token.as_array().value() == 0x01) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_simple) {
+    auto result = consume(ScanState{}, 0xe1);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_simple().value() == 0x01) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_float) {
+    std::vector<std::uint8_t> test_vector{0xf9, 0x01, 0x02};
+    auto result = consume(ScanState{}, test_vector);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_float().value() == 0x0102) {
+      return pass(current().function_name());
     }
     return fail(current().function_name());
   }
@@ -82,5 +201,16 @@ int main(int argc, char *argv[]) {
   CBORScannerTests testSuite{};
   testSuite.test_decode_uint();
   testSuite.test_decode_nint();
+  testSuite.test_decode_bstrx();
+  testSuite.test_decode_bstr0();
+  testSuite.test_decode_bstr();
+  testSuite.test_decode_tstrx();
+  testSuite.test_decode_tstr0();
+  testSuite.test_decode_tstr();
+  testSuite.test_decode_arrayx();
+  testSuite.test_decode_array0();
+  testSuite.test_decode_array();
+  testSuite.test_decode_simple();
+  testSuite.test_decode_float();
   return testSuite.failure();
 }

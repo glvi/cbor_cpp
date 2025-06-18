@@ -19,7 +19,14 @@
 #include <cstdlib>
 #include <expected>
 #include <optional>
+#include <type_traits>
 #include <variant>
+
+static_assert(not std::is_nothrow_default_constructible_v<Token>);
+static_assert(std::is_nothrow_move_constructible_v<Token>);
+static_assert(std::is_copy_constructible_v<Token>);
+static_assert(std::is_nothrow_move_assignable_v<Token>);
+static_assert(std::is_copy_assignable_v<Token>);
 
 auto unexpected_head_error(std::byte octet) -> ScanResult {
   return ScanError{scan_error::UnexpectedHead{octet}};
@@ -264,6 +271,6 @@ struct Scanner {
         return std::unexpected(std::move(e));
       }
     };
-    return std::visit(ResultProcessor {state}, std::move(scan_result));
+    return visit(ResultProcessor {state}, std::move(scan_result));
   }
 };
