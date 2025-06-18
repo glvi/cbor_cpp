@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: aminya/setup-cpp@v0.28.0
+      with:
+        gcc: 15
     - name: Install DejaGNU
       run: sudo apt-get install dejagnu
     - uses: actions/checkout@v3
