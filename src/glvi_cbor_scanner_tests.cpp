@@ -171,6 +171,53 @@ public:
     return fail(current().function_name());
   }
 
+  TEST_CASE(decode_mapx) {
+    auto result = consume(ScanState{}, 0xbf);
+    auto [_, token] = result.as_complete().value();
+    if (token.is_mapx()) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_map0) {
+    auto result = consume(ScanState{}, 0xa0);
+    auto [_, token] = result.as_complete().value();
+    if (token.as_map().value() == 0x00) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_map) {
+    std::vector<std::uint8_t> test_vector{0xa1, 0x01};
+    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
+    if (token.as_map().value() == 0x01) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
+  TEST_CASE(decode_tag) {
+    auto [_, token] = consume(ScanState{}, 0xc1).as_complete().value();
+    if (token.as_tag().value() == 0x01) {
+      return pass(current().function_name());
+    }
+    return fail(current().function_name());
+  }
+  catch (...) {
+    return fail(current().function_name());
+  }
+
   TEST_CASE(decode_simple) {
     auto result = consume(ScanState{}, 0xe1);
     auto [_, token] = result.as_complete().value();
@@ -210,6 +257,10 @@ int main(int argc, char *argv[]) {
   testSuite.test_decode_arrayx();
   testSuite.test_decode_array0();
   testSuite.test_decode_array();
+  testSuite.test_decode_mapx();
+  testSuite.test_decode_map0();
+  testSuite.test_decode_map();
+  testSuite.test_decode_tag();
   testSuite.test_decode_simple();
   testSuite.test_decode_float();
   return testSuite.failure();
