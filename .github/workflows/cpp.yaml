@@ -16,6 +16,8 @@ jobs:
     - uses: aminya/setup-cpp@v0.28.0
       with:
         gcc: 14
+    - name: Install Autogen
+      run: sudo apt-get install autogen
     - name: Install DejaGNU
       run: sudo apt-get install dejagnu
     - uses: actions/checkout@v3
