@@ -1,0 +1,80 @@
+autogen definitions token.tpl;
+
+token = {
+  kind = Uint;
+  comment = "unsigned integer";
+  value_type = "std::uint64_t";
+};
+
+token = {
+  kind = Nint;
+  comment = "negative integer";
+  value_type = "std::uint64_t";
+};
+
+token = {
+  kind = BstrX;
+  comment = "sequence of bytes, indefinite length";
+};
+
+token = {
+  kind = Bstr;
+  comment = "sequence of bytes, definite length";
+  value_type = "std::vector<std::byte>";
+};
+
+token = {
+  kind = TstrX;
+  comment = "text string encoded as UTF-8, indefinite length";
+};
+
+token = {
+  kind = Tstr;
+  comment = "text string encoded as UTF-8, definite length";
+  value_type = "std::vector<std::byte>";
+};
+
+token = {
+  kind = ArrayX;
+  comment = "sequence of CBOR values, indefinite length";
+};
+
+token = {
+  kind = Array;
+  comment = "sequence of CBOR values, definite length";
+  value_type = "std::uint64_t";
+};
+
+token = {
+  kind = MapX;
+  comment = "sequence of pairs of CBOR values, indefinite length";
+};
+
+token = {
+  kind = Map;
+  comment = "sequence of pairs of CBOR values, definite length";
+  value_type = "std::uint64_t";
+};
+
+token = {
+  kind = Tag;
+  comment = "tagged value";
+  value_type = "std::uint64_t";
+};
+
+token = {
+  kind = Simple;
+  comment = "simple value";
+  value_type = "std::uint8_t";
+};
+
+token = {
+  kind = Float;
+  comment = "floating-point value";
+  value_type = "std::uint64_t";
+};
+
+token = {
+  kind = Break;
+  comment = "end of an indefinite sequence";
+};

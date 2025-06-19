@@ -16,7 +16,8 @@ libglvi_cbor_la_SOURCES = \
     glvi_cbor_simple.cpp \
     glvi_cbor_float.cpp \
     glvi_cbor_value.cpp \
-    glvi_cbor_scanner.cpp
+    glvi_cbor_scanner.cpp \
+    $(libglvi_cbor_la_HEADERS)
 
 libglvi_cbor_ladir = $(includeDir)
 
@@ -36,6 +37,17 @@ libglvi_cbor_la_HEADERS = \
     glvi_cbor_u64.h \
     glvi_cbor_uint.h \
     glvi_cbor_value.h
+
+nodist_libglvi_cbor_la_SOURCES = glvi_cbor_token.h
+
+EXTRA_DIST = token.def token.tpl
+
+glvi_cbor_token.h: $(srcdir)/token.def $(srcdir)/token.tpl
+	$(AUTOGEN) -bglvi_cbor_token -T$(srcdir)/token.tpl --writable $(srcdir)/token.def
+
+BUILT_SOURCES = glvi_cbor_token.h
+
+CLEANFILES = glvi_cbor_token.h
 
 check_PROGRAMS = \
     glvi_cbor_bstr_tests \

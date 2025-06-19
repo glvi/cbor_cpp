@@ -28,6 +28,7 @@ AC_INIT([glvi_cbor],
 	[info@glvi.de],
 	[glvi-cbor],
 	[https://github.com/glvi/cbor_cpp])
+AC_ARG_VAR(AUTOGEN, [Automated program generator])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_SRCDIR([src/glvi_cbor.cpp])
 dnl ********************************************************************
@@ -38,6 +39,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror dejagnu foreign])
 AC_PROG_CXX
 AM_PROG_AR
 LT_INIT
+AC_PATH_PROG(AUTOGEN, autogen)
 dnl ********************************************************************
 
 dnl ********************************************************************
