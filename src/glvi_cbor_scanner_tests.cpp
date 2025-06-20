@@ -115,6 +115,15 @@ class CBORScannerTests : TestState, std::source_location {
     return expect(std::move(loc), &Token::as_array, expected, std::move(from));
   }
 
+  inline auto expect_mapx(std::source_location loc, vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::is_mapx, std::move(from));
+  }
+
+  inline auto expect_map(std::source_location loc, std::uint64_t expected,
+                         vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::as_map, expected, std::move(from));
+  }
+
 public:
   inline auto success() const noexcept {
     return numFailed_ == 0;
@@ -369,40 +378,50 @@ public:
                         {0x9b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17});
   }
 
-  TEST_CASE(decode_mapx) {
-    auto result = consume(ScanState{}, 0xbf);
-    auto [_, token] = result.as_complete().value();
-    if (token.is_mapx()) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_mapx() noexcept {
+    return expect_mapx(current(), {0xbf});
   }
 
-  TEST_CASE(decode_map0) {
-    auto result = consume(ScanState{}, 0xa0);
-    auto [_, token] = result.as_complete().value();
-    if (token.as_map().value() == 0x00) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_map0() noexcept {
+    return expect_map(current(), 0, {0xa0});
   }
 
-  TEST_CASE(decode_map) {
-    std::vector<std::uint8_t> test_vector{0xa1, 0x01};
-    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
-    if (token.as_map().value() == 0x01) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
+  auto test_decode_map1() noexcept {
+    return expect_map(current(), 0, {0xb8, 0x00});
   }
-  catch (...) {
-    return fail(current().function_name());
+
+  auto test_decode_map2() noexcept {
+    return expect_map(current(), 0, {0xb9, 0x00, 0x00});
+  }
+
+  auto test_decode_map4() noexcept {
+    return expect_map(current(), 0, {0xba, 0x00, 0x00, 0x00, 0x00});
+  }
+
+  auto test_decode_map8() noexcept {
+    return expect_map(current(), 0,
+                      {0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+  }
+
+  auto test_decode_map0_with_payload() noexcept {
+    return expect_map(current(), 0x17, {0xb7});
+  }
+
+  auto test_decode_map1_with_payload() noexcept {
+    return expect_map(current(), 0x17, {0xb8, 0x17});
+  }
+
+  auto test_decode_map2_with_payload() noexcept {
+    return expect_map(current(), 0x17, {0xb9, 0x00, 0x17});
+  }
+
+  auto test_decode_map4_with_payload() noexcept {
+    return expect_map(current(), 0x17, {0xba, 0x00, 0x00, 0x00, 0x17});
+  }
+
+  auto test_decode_map8_with_payload() noexcept {
+    return expect_map(current(), 0x17,
+                      {0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17});
   }
 
   TEST_CASE(decode_tag) {
@@ -489,7 +508,15 @@ int main(int argc, char *argv[]) {
   testSuite.test_decode_array8_with_payload();
   testSuite.test_decode_mapx();
   testSuite.test_decode_map0();
-  testSuite.test_decode_map();
+  testSuite.test_decode_map1();
+  testSuite.test_decode_map2();
+  testSuite.test_decode_map4();
+  testSuite.test_decode_map8();
+  testSuite.test_decode_map0_with_payload();
+  testSuite.test_decode_map1_with_payload();
+  testSuite.test_decode_map2_with_payload();
+  testSuite.test_decode_map4_with_payload();
+  testSuite.test_decode_map8_with_payload();
   testSuite.test_decode_tag();
   testSuite.test_decode_simple();
   testSuite.test_decode_float();
