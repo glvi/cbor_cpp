@@ -124,6 +124,11 @@ class CBORScannerTests : TestState, std::source_location {
     return expect(std::move(loc), &Token::as_map, expected, std::move(from));
   }
 
+  inline auto expect_tag(std::source_location loc, std::uint64_t expected,
+                         vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::as_tag, expected, std::move(from));
+  }
+
 public:
   inline auto success() const noexcept {
     return numFailed_ == 0;
@@ -424,15 +429,25 @@ public:
                       {0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17});
   }
 
-  TEST_CASE(decode_tag) {
-    auto [_, token] = consume(ScanState{}, 0xc1).as_complete().value();
-    if (token.as_tag().value() == 0x01) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
+  auto test_decode_tag0() noexcept {
+    return expect_tag(current(), 0, {0xc0});
   }
-  catch (...) {
-    return fail(current().function_name());
+
+  auto test_decode_tag1() noexcept {
+    return expect_tag(current(), 0, {0xd8, 0x00});
+  }
+
+  auto test_decode_tag2() noexcept {
+    return expect_tag(current(), 0, {0xd9, 0x00, 0x00});
+  }
+
+  auto test_decode_tag4() noexcept {
+    return expect_tag(current(), 0, {0xda, 0x00, 0x00, 0x00, 0x00});
+  }
+
+  auto test_decode_tag8() noexcept {
+    return expect_tag(current(), 0,
+                      {0xdb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
   }
 
   TEST_CASE(decode_simple) {
@@ -517,7 +532,11 @@ int main(int argc, char *argv[]) {
   testSuite.test_decode_map2_with_payload();
   testSuite.test_decode_map4_with_payload();
   testSuite.test_decode_map8_with_payload();
-  testSuite.test_decode_tag();
+  testSuite.test_decode_tag0();
+  testSuite.test_decode_tag1();
+  testSuite.test_decode_tag2();
+  testSuite.test_decode_tag4();
+  testSuite.test_decode_tag8();
   testSuite.test_decode_simple();
   testSuite.test_decode_float();
   return testSuite.failure();
