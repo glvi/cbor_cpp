@@ -18,7 +18,7 @@ class glvi_cborConan(ConanFile):
     license = "GPL-3.0-or-later"
     author = "Kai Lothar John (l.john@glvi.de)"
     url = "https://github.com/glvi/cbor_cpp"
-    description = "Utilities for decoding Concise Binary Object Representation"
+    description = "Library for decoding Concise Binary Object Representation"
     topics = ("cbor")
 
     # Binary configuration
