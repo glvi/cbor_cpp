@@ -95,6 +95,26 @@ class CBORScannerTests : TestState, std::source_location {
                   std::move(from));
   }
 
+  inline auto expect_tstrx(std::source_location loc, vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::is_tstrx, std::move(from));
+  }
+
+  inline auto expect_tstr(std::source_location loc,
+                          std::vector<std::byte> expected,
+                          vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::as_tstr, std::move(expected),
+                  std::move(from));
+  }
+
+  inline auto expect_arrayx(std::source_location loc, vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::is_arrayx, std::move(from));
+  }
+
+  inline auto expect_array(std::source_location loc, std::uint64_t expected,
+                           vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::as_array, expected, std::move(from));
+  }
+
 public:
   inline auto success() const noexcept {
     return numFailed_ == 0;
@@ -224,93 +244,129 @@ public:
     return expect_bstr(current(), to_vec_byte(expected), test_vector);
   }
 
-  TEST_CASE(decode_tstrx) {
-    auto result = consume(ScanState{}, 0x7f);
-    auto [_, token] = result.as_complete().value();
-    if (token.is_tstrx()) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_tstrx() noexcept {
+    return expect_tstrx(current(), {0x7f});
   }
 
-  TEST_CASE(decode_tstr0) {
-    auto result = consume(ScanState{}, 0x60);
-    auto [_, token] = result.as_complete().value();
-    if (token.as_tstr().value() == std::vector<std::byte>{}) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_tstr0() noexcept {
+    return expect_tstr(current(), {}, {0x60});
   }
 
-  TEST_CASE(decode_tstr) {
-    std::vector<std::uint8_t> test_vector{0x61, 0x01};
-    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
-    if (token.as_tstr().value() == std::vector{std::byte{0x01}}) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_tstr1() noexcept {
+    return expect_tstr(current(), {}, {0x78, 0x00});
   }
 
-  TEST_CASE(decode_arrayx) {
-    auto result = consume(ScanState{}, 0x9f);
-    auto [_, token] = result.as_complete().value();
-    if (token.is_arrayx()) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_tstr2() noexcept {
+    return expect_tstr(current(), {}, {0x79, 0x00, 0x00});
   }
 
-  TEST_CASE(decode_array0) {
-    auto result = consume(ScanState{}, 0x80);
-    auto [_, token] = result.as_complete().value();
-    if (token.as_array().value() == 0x00) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_tstr4() noexcept {
+    return expect_tstr(current(), {}, {0x7a, 0x00, 0x00, 0x00, 0x00});
   }
 
-  TEST_CASE(decode_array1) {
-    std::vector<std::uint8_t> test_vector{0x81, 0x01};
-    auto [_, token] = consume(ScanState{}, test_vector).as_complete().value();
-    if (token.as_array().value() == 0x01) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
-  }
-  catch (...) {
-    return fail(current().function_name());
+  auto test_decode_tstr8() noexcept {
+    return expect_tstr(current(), {},
+                       {0x7b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
   }
 
-  TEST_CASE(decode_array2) {
-    std::vector<std::uint8_t> test_vector{0x99, 0x01};
-    auto result = consume(ScanState{}, test_vector);
-    if (result.is_incomplete()) {
-      return pass(current().function_name());
-    } else if (result.is_error()) {
-      note("%s:%d: Result is <ERROR>", current().file_name(), current().line());
-    } else if (result.is_complete()) {
-      note("%s:%d: Result is <COMPLETE>", current().file_name(),
-           current().line());
-    }
-    return fail(current().function_name());
+  auto test_decode_tstr0_with_payload() noexcept {
+    auto test_vector = vec_u8{0x77, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+                              0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
+                              0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    auto expected = vec_u8{0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+                           0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+                           0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    return expect_tstr(current(), to_vec_byte(expected), test_vector);
   }
-  catch (...) {
-    return fail(current().function_name());
+
+  auto test_decode_tstr1_with_payload() noexcept {
+    auto test_vector =
+        vec_u8{0x78, 0x17, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+               0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+               0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    auto expected = vec_u8{0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+                           0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+                           0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    return expect_tstr(current(), to_vec_byte(expected), test_vector);
+  }
+
+  auto test_decode_tstr2_with_payload() noexcept {
+    auto test_vector =
+        vec_u8{0x79, 0x00, 0x17, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
+               0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
+               0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    auto expected = vec_u8{0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+                           0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+                           0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    return expect_tstr(current(), to_vec_byte(expected), test_vector);
+  }
+
+  auto test_decode_tstr4_with_payload() noexcept {
+    auto test_vector =
+        vec_u8{0x7a, 0x00, 0x00, 0x00, 0x17, 0x41, 0x42, 0x43, 0x44, 0x45,
+               0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
+               0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    auto expected = vec_u8{0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+                           0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+                           0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    return expect_tstr(current(), to_vec_byte(expected), test_vector);
+  }
+
+  auto test_decode_tstr8_with_payload() noexcept {
+    auto test_vector =
+        vec_u8{0x7b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17, 0x41, 0x42,
+               0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d,
+               0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    auto expected = vec_u8{0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+                           0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+                           0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57};
+    return expect_tstr(current(), to_vec_byte(expected), test_vector);
+  }
+
+  auto test_decode_arrayx() noexcept {
+    return expect_arrayx(current(), {0x9f});
+  }
+
+  auto test_decode_array0() noexcept {
+    return expect_array(current(), 0, {0x80});
+  }
+
+  auto test_decode_array1() noexcept {
+    return expect_array(current(), 0, {0x98, 0x00});
+  }
+
+  auto test_decode_array2() noexcept {
+    return expect_array(current(), 0, {0x99, 0x00, 0x00});
+  }
+
+  auto test_decode_array4() noexcept {
+    return expect_array(current(), 0, {0x9a, 0x00, 0x00, 0x00, 0x00});
+  }
+
+  auto test_decode_array8() noexcept {
+    return expect_array(current(), 0,
+                        {0x9b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+  }
+
+  auto test_decode_array0_with_payload() noexcept {
+    return expect_array(current(), 0x17, {0x97});
+  }
+
+  auto test_decode_array1_with_payload() noexcept {
+    return expect_array(current(), 0x17, {0x98, 0x17});
+  }
+
+  auto test_decode_array2_with_payload() noexcept {
+    return expect_array(current(), 0x17, {0x99, 0x00, 0x17});
+  }
+
+  auto test_decode_array4_with_payload() noexcept {
+    return expect_array(current(), 0x17, {0x9a, 0x00, 0x00, 0x00, 0x17});
+  }
+
+  auto test_decode_array8_with_payload() noexcept {
+    return expect_array(current(), 0x17,
+                        {0x9b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17});
   }
 
   TEST_CASE(decode_mapx) {
@@ -411,11 +467,26 @@ int main(int argc, char *argv[]) {
   testSuite.test_decode_bstr8_with_payload();
   testSuite.test_decode_tstrx();
   testSuite.test_decode_tstr0();
-  testSuite.test_decode_tstr();
+  testSuite.test_decode_tstr1();
+  testSuite.test_decode_tstr2();
+  testSuite.test_decode_tstr4();
+  testSuite.test_decode_tstr8();
+  testSuite.test_decode_tstr0_with_payload();
+  testSuite.test_decode_tstr1_with_payload();
+  testSuite.test_decode_tstr2_with_payload();
+  testSuite.test_decode_tstr4_with_payload();
+  testSuite.test_decode_tstr8_with_payload();
   testSuite.test_decode_arrayx();
   testSuite.test_decode_array0();
   testSuite.test_decode_array1();
   testSuite.test_decode_array2();
+  testSuite.test_decode_array4();
+  testSuite.test_decode_array8();
+  testSuite.test_decode_array0_with_payload();
+  testSuite.test_decode_array1_with_payload();
+  testSuite.test_decode_array2_with_payload();
+  testSuite.test_decode_array4_with_payload();
+  testSuite.test_decode_array8_with_payload();
   testSuite.test_decode_mapx();
   testSuite.test_decode_map0();
   testSuite.test_decode_map();
