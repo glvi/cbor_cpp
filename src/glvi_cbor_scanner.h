@@ -152,13 +152,32 @@ public:
      The returned value will contain the state to continue from.
    - `scan_result::Complete` when a complete token is available.
      The returned value will contain the state to continue from, and the
-   completed token.
+     completed token.
    - `ScanError` when something went wrong.
      The returned value contains the error that occurred.
-     The state of the scanner is comprised and will be destroyed.
  */
 auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult;
 
+/**
+   Scans the input range specified by `[first,last)`.
+
+   If, while scanning the input range, the scanner encounters an
+   error, it stops scanning, and returns `ScanError`. The returned
+   value contains the error that occurred.
+
+   If, while scanning the input range, the scanner encounters a
+   complete token, it stops scanning, and returns
+   `scan_result::Complete`. The returned value will contain the state
+   to continue from, and the completed token.
+
+   If, while scanning the input range, the scanner encounters the end
+   of the range before completing a token, it returns
+   `scan_result::Incomplete`. The returned value will contain the
+   state to continue from.
+
+   If the input range is initially empty, the scanner returns
+   `scan_result::Incomplete` with the initial state unmodified.
+ */
 template <std::input_iterator Iterator, std::sentinel_for<Iterator> Sentinel>
   requires std::same_as<std::uint8_t, typename Iterator::value_type>
 auto consume(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
@@ -171,6 +190,11 @@ auto consume(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
   return scan_result::Incomplete{std::move(state)};
 }
 
+/**
+   Scans the input range specified by `range`.
+
+   See `auto consume(ScanState&&, Iterator, Sentinel) -> ScanResult`
+ */
 template <std::ranges::input_range Range>
   requires std::same_as<std::uint8_t, typename Range::value_type>
 auto consume(ScanState&& state, Range range) -> ScanResult {
