@@ -34,8 +34,6 @@ using vec_u8 = std::vector<std::uint8_t>;
 
 using vec_byte = std::vector<std::byte>;
 
-#define TEST_CASE(name) auto test_##name() noexcept try
-
 class CBORScannerTests : TestState, std::source_location {
   unsigned numFailed_ = 0;
 
