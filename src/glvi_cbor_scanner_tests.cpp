@@ -134,6 +134,11 @@ class CBORScannerTests : TestState, std::source_location {
     return expect(std::move(loc), &Token::as_simple, expected, std::move(from));
   }
 
+  inline auto expect_float(std::source_location loc, std::uint64_t expected,
+                           vec_u8 from) noexcept {
+    return expect(std::move(loc), &Token::as_float, expected, std::move(from));
+  }
+
 public:
   inline auto success() const noexcept {
     return numFailed_ == 0;
@@ -463,17 +468,17 @@ public:
     return expect_simple(current(), 0, {0xf8, 0x00});
   }
 
-  TEST_CASE(decode_float) {
-    std::vector<std::uint8_t> test_vector{0xf9, 0x01, 0x02};
-    auto result = consume(ScanState{}, test_vector);
-    auto [_, token] = result.as_complete().value();
-    if (token.as_float().value() == 0x0102) {
-      return pass(current().function_name());
-    }
-    return fail(current().function_name());
+  auto test_decode_float2() noexcept {
+    return expect_float(current(), 0, {0xf9, 0x00, 0x00});
   }
-  catch (...) {
-    return fail(current().function_name());
+
+  auto test_decode_float4() noexcept {
+    return expect_float(current(), 0, {0xfa, 0x00, 0x00, 0x00, 0x00});
+  }
+
+  auto test_decode_float8() noexcept {
+    return expect_float(current(), 0,
+                        {0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
   }
 };
 
@@ -540,6 +545,8 @@ int main(int argc, char *argv[]) {
   testSuite.test_decode_tag8();
   testSuite.test_decode_simple0();
   testSuite.test_decode_simple1();
-  testSuite.test_decode_float();
+  testSuite.test_decode_float2();
+  testSuite.test_decode_float4();
+  testSuite.test_decode_float8();
   return testSuite.failure();
 }
