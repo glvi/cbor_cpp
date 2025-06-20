@@ -18,7 +18,7 @@ dnl along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 dnl ********************************************************************
 dnl Autoconf requirements
-dnl (empty)
+AC_CONFIG_MACRO_DIRS([m4])
 dnl ********************************************************************
 
 dnl ********************************************************************
@@ -75,18 +75,8 @@ dnl ********************************************************************
 dnl
 dnl checks for structures
 dnl
-
-dnl Check for std::expected
-AC_LANG([C++])
-AC_MSG_CHECKING([for std::expected])
-AC_COMPILE_IFELSE(
-  [AC_LANG_SOURCE([dnl
-#include <expected>
-auto test_std_expected() -> std::expected<float,int> {
-  return std::unexpected(0);
-}])],
-  [AC_MSG_RESULT(yes)],
-  [AC_MSG_ERROR([C++23 required to compile the sources])])
+GLVI_CXX_LIB_RANGES
+GLVI_CXX_LIB_EXPECTED
 dnl ********************************************************************
 
 dnl ********************************************************************
@@ -106,8 +96,12 @@ dnl ********************************************************************
 
 dnl ********************************************************************
 dnl Emit configuration
-AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
+dnl ********************************************************************
+
+dnl Final notes
+test "x$glvi_cv_cxx_lib_ranges" = "xyes" || AC_MSG_WARN([Required C++ library feature '__cpp_lib_ranges' (C++20) missing.])
+test "x$glvi_cv_cxx_lib_expected" = "xyes" || AC_MSG_WARN([Required C++ library feature '__cpp_lib_expected' (C++23) missing.])
 dnl ********************************************************************
 dnl (end of file)
