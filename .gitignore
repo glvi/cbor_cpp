@@ -31,9 +31,14 @@
 *.out
 *.app
 
+# Emacs backup files
+*~
+
 # Administrative stuff
 autom4te.cache/
+build/
 build-debug/
+build-release/
 Makefile.in
 aclocal.m4
 ar-lib
