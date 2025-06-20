@@ -42,10 +42,6 @@ class CBORScannerTests : TestState, std::source_location {
     numFailed_++;
   }
 
-  static constexpr auto to_byte = [](auto n) { return std::byte(n); };
-
-  static constexpr auto to_bytes = std::views::transform(to_byte);
-
   template <typename Assessor>
   auto expect(std::source_location loc, Assessor assess, vec_u8 from) noexcept
       try {
