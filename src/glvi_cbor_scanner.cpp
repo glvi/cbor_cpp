@@ -115,7 +115,7 @@ auto gather_bytes(Kind kind, std::uint64_t count) {
   return scan_result::Incomplete{scan_state::Pay{kind, {}, count}};
 }
 
-auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult {
+auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult {
   struct ByteConsumer {
     std::uint8_t byte;
     auto operator()(scan_state::Head) -> ScanResult {
@@ -227,8 +227,8 @@ auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult {
 struct Scanner {
   ScanState state;
 
-  auto consume(std::uint8_t octet) -> std::expected<std::optional<Token>, ScanError> {
-    auto scan_result = ::consume(std::move(state), octet);
+  auto scan(std::uint8_t octet) -> std::expected<std::optional<Token>, ScanError> {
+    auto scan_result = ::scan(std::move(state), octet);
     struct ResultProcessor {
       ScanState& state;
       auto operator()(scan_result::Incomplete&& i) -> std::expected<std::optional<Token>, ScanError> {

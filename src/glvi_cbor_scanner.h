@@ -204,7 +204,7 @@ public:
    - `ScanError` when something went wrong.
      The returned value contains the error that occurred.
  */
-auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult;
+auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult;
 
 /**
    Scans the input range specified by `[first,last)`.
@@ -228,9 +228,9 @@ auto consume(ScanState&& state, std::uint8_t byte) -> ScanResult;
  */
 template <std::input_iterator Iterator, std::sentinel_for<Iterator> Sentinel>
   requires std::same_as<std::uint8_t, typename Iterator::value_type>
-auto consume(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
+auto scan(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
   while (first != last) {
-    auto result = ::consume(std::move(state), *first++);
+    auto result = ::scan(std::move(state), *first++);
     if (result.is_error() or result.is_complete())
       return result;
     state = result.as_incomplete().value();
@@ -245,6 +245,6 @@ auto consume(ScanState&& state, Iterator first, Sentinel last) -> ScanResult {
  */
 template <std::ranges::input_range Range>
   requires std::same_as<std::uint8_t, typename Range::value_type>
-auto consume(ScanState&& state, Range range) -> ScanResult {
-  return consume(std::move(state), range.begin(), range.end());
+auto scan(ScanState&& state, Range range) -> ScanResult {
+  return scan(std::move(state), range.begin(), range.end());
 }

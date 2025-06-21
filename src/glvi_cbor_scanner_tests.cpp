@@ -45,7 +45,7 @@ class CBORScannerTests : TestState, std::source_location {
   template <typename Assessor>
   auto expect(std::source_location loc, Assessor assess, vec_u8 from) noexcept
       try {
-    auto result = consume(ScanState{}, std::move(from));
+    auto result = scan(ScanState{}, std::move(from));
     auto [_, token] = result.as_complete().value();
     if ((token.*assess)()) {
       return pass(loc.function_name());
@@ -58,7 +58,7 @@ class CBORScannerTests : TestState, std::source_location {
   template <typename Extractor, typename Expected>
   auto expect(std::source_location loc, Extractor extract, Expected expected,
               vec_u8 from) noexcept try {
-    auto result = consume(ScanState{}, std::move(from));
+    auto result = scan(ScanState{}, std::move(from));
     auto [_, token] = result.as_complete().value();
     if ((token.*extract)().value() == expected) {
       return pass(loc.function_name());
