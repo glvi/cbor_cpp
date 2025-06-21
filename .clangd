@@ -1,10 +1,48 @@
 # -*- mode: yaml; coding: utf-8-unix; -*-
 If:
-  PathMatch: .*\.h
+  PathMatch:
+    - src/.*\.h
 CompileFlags:
-  Add: [-xc++-header, -std=c++23]
+  Remove:
+    - -xobjective-c++-header
+  Add:
+    - -xc++-header
+    - -std=c++23
+    - -I../build-debug/src
+    - -I../build-release/src
+    - -I../build/src
 ---
 If:
-  PathMatch: .*\.cpp
+  PathMatch:
+    - build/src/.*\.h
+    - build-debug/src/.*\.h
+    - build-release/src/.*\.h
 CompileFlags:
-  Add: [-xc++, -std=c++23]
+  Remove:
+    - -xobjective-c++-header
+  Add:
+    - -xc++-header
+    - -std=c++23
+    - -I../../src
+---
+If:
+  PathMatch:
+    - src/.*\.cpp
+CompileFlags:
+  Add:
+    - -xc++
+    - -std=c++23
+    - -I../build-debug/src
+    - -I../build-release/src
+    - -I../build/src
+---
+If:
+  PathMatch:
+    - build/src/.*\.cpp
+    - build-debug/src/.*\.cpp
+    - build-release/src/.*\.cpp
+CompileFlags:
+  Add:
+    - -xc++
+    - -std=c++23
+    - -I../../src
