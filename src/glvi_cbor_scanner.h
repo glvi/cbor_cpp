@@ -17,6 +17,9 @@
 #pragma once
 #include "glvi_cbor_token.h"
 
+/**
+   Errors specific to lexical scanning
+ */
 namespace scan_error {
 
   /**
@@ -54,52 +57,80 @@ namespace scan_error {
 /// @copydoc scan_error::ScanError
 using scan_error::ScanError;
 
+/// Internal states of the lexical scanner
 namespace scan_state {
 
+  /**
+     Expecting the next byte in "head" position
+   */
   struct Head {};
 
+  /**
+     Expecting the next byte in "argument" position
+   */
   struct Arg {
     Kind kind;
     std::uint64_t arg;
     std::size_t pending;
   };
 
+  /**
+     Expecting the next byte in "payload" position
+   */
   struct Pay {
     Kind kind;
     std::vector<std::byte> bytes;
     std::size_t pending;
   };
 
+  /// State of the lexical scanner
   using ScanState = std::variant<Head, Arg, Pay>;
 
 } // namespace scan_state
 
+/// State of the lexical scanner
 using scan_state::ScanState;
 
+/**
+   Possible results when scanning input
+ */
 namespace scan_result {
-
+  /**
+     More input is needed
+   */
   struct Incomplete {
     ScanState state;
   };
 
+  /**
+     We have a token!
+   */
   struct Complete {
     ScanState state;
     Token token;
   };
 
+  /// Result of scanning some input
   using ScanResult = std::variant<Incomplete, Complete, ScanError>;
 
-  inline namespace error {
+  /// Errors that occur when accessing a scan result.
+  inline namespace access_error {
     struct NotIncomplete {};
     struct NotComplete {};
     struct NotError {};
-  } // namespace error
+  } // namespace access_error
 
 } // namespace scan_result
 
+/**
+   identifies types that can be used to construct a scan result.
+ */
 template <typename T>
 concept scan_result_type = std::constructible_from<scan_result::ScanResult, T>;
 
+/**
+   Result of scanning some input
+ */
 class ScanResult {
   scan_result::ScanResult result;
 
@@ -115,10 +146,7 @@ public:
   ScanResult() = delete;
 
   template <scan_result_type Result>
-  ScanResult(Result result) : result{std::move(result)} {
-  }
-
-  ScanResult(ScanError error) : result{std::move(error)} {
+  ScanResult(Result&& result) : result{std::forward<Result>(result)} {
   }
 
   constexpr auto is_incomplete() noexcept -> bool {
@@ -134,26 +162,26 @@ public:
   }
 
   constexpr auto as_incomplete()
-      -> std::expected<ScanState, scan_result::error::NotIncomplete> {
+      -> std::expected<ScanState, scan_result::access_error::NotIncomplete> {
     if (not is_incomplete())
-      return std::unexpected(scan_result::error::NotIncomplete{});
+      return std::unexpected(scan_result::access_error::NotIncomplete{});
     auto [state] = get<scan_result::Incomplete>();
     return state;
   }
 
   constexpr auto as_complete()
       -> std::expected<std::tuple<ScanState, Token>,
-                       scan_result::error::NotComplete> {
+                       scan_result::access_error::NotComplete> {
     if (not is_complete())
-      return std::unexpected(scan_result::error::NotComplete{});
+      return std::unexpected(scan_result::access_error::NotComplete{});
     auto [state, token] = get<scan_result::Complete>();
     return std::make_tuple(state, token);
   }
 
   constexpr auto as_error()
-      -> std::expected<ScanError, scan_result::error::NotError> {
+      -> std::expected<ScanError, scan_result::access_error::NotError> {
     if (not is_error())
-      return std::unexpected(scan_result::error::NotError{});
+      return std::unexpected(scan_result::access_error::NotError{});
     return get<ScanError>();
   }
 
