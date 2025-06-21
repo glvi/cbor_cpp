@@ -189,18 +189,12 @@ auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult {
       if (arg.pending > 0) {
         return scan_result::Incomplete{std::move(arg)};
       } else if (arg.arg == 0) {
-        switch (arg.kind) {
-        case Kind::Bstr : return token_bstr_empty();
-        case Kind::Tstr : return token_tstr_empty();
-        case Kind::Array: return token_array_empty();
-        case Kind::Map  : return token_map_empty();
-        default         : return make_token(arg.kind, arg.arg, {});
-        }
+	return make_token(arg.kind);
       } else {
         switch (arg.kind) {
         case Kind::Bstr:
         case Kind::Tstr: return gather_bytes(arg.kind, arg.arg);
-        default        : return make_token(arg.kind, arg.arg, {});
+        default        : return make_token(arg.kind, arg.arg);
         }
       }
     }
