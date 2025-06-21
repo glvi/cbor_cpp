@@ -1,4 +1,4 @@
-[+ autogen5 template h +]
+[+ autogen5 template h cpp +]
 //  -*- mode: c++; coding: utf-8-unix; -*-
 //
 [+(dne "// ")+]
@@ -18,7 +18,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-#pragma once
+[+ CASE (suffix) +][+ == h +]#pragma once
 #include <cstdint>
 #include <expected>
 #include <utility>
@@ -71,6 +71,8 @@ class Token {
   }
 
 public:
+  static auto make(Kind kind, std::uint64_t argument, std::vector<std::byte> payload) -> Token;
+
   template <token_type TokenType>
   Token(TokenType token) : token{std::move(token)} {
   }
@@ -87,3 +89,23 @@ public:
   }
   [+ ENDIF +][+ ENDFOR token +]
 };
+
+[+ == cpp +]#include "glvi_cbor_token.h"
+
+static_assert(not std::is_nothrow_default_constructible_v<Token>);
+static_assert(std::is_nothrow_move_constructible_v<Token>);
+static_assert(std::is_copy_constructible_v<Token>);
+static_assert(std::is_nothrow_move_assignable_v<Token>);
+static_assert(std::is_copy_assignable_v<Token>);
+
+auto Token::make(Kind kind, std::uint64_t argument, std::vector<std::byte> payload) -> Token {
+  switch (kind) {
+  [+ FOR token +][+
+  CASE value_type +]
+  [+ == "std::uint64_t" +]case Kind::[+kind+]: return token::[+kind+]{argument};
+  [+ == "std::uint8_t" +]case Kind::[+kind+]: return token::[+kind+]{static_cast<std::uint8_t>(argument)};
+  [+ ~~* "std::vector" +]case Kind::[+kind+]: return token::[+kind+]{std::move(payload)};
+  [+ !E +]case Kind::[+kind+]: return token::[+kind+]{};
+  [+ ESAC +][+ ENDFOR token +]}
+}
+[+ ESAC +]

@@ -19,45 +19,17 @@
 #include <cstdlib>
 #include <expected>
 #include <optional>
-#include <type_traits>
 #include <variant>
-
-static_assert(not std::is_nothrow_default_constructible_v<Token>);
-static_assert(std::is_nothrow_move_constructible_v<Token>);
-static_assert(std::is_copy_constructible_v<Token>);
-static_assert(std::is_nothrow_move_assignable_v<Token>);
-static_assert(std::is_copy_assignable_v<Token>);
 
 auto unexpected_head_error(std::byte octet) -> ScanResult {
   return ScanError{scan_error::UnexpectedHead{octet}};
-}
-
-auto make_token_(Kind kind, std::uint64_t argument,
-                 std::vector<std::byte> payload) -> Token {
-  switch (kind) {
-  case Kind::Uint  : return token::Uint{argument};
-  case Kind::Nint  : return token::Nint{argument};
-  case Kind::BstrX : return token::BstrX{};
-  case Kind::Bstr  : return token::Bstr{std::move(payload)};
-  case Kind::TstrX : return token::TstrX{};
-  case Kind::Tstr  : return token::Tstr{std::move(payload)};
-  case Kind::ArrayX: return token::ArrayX{};
-  case Kind::Array : return token::Array{argument};
-  case Kind::MapX  : return token::MapX{};
-  case Kind::Map   : return token::Map{argument};
-  case Kind::Tag   : return token::Tag{argument};
-  case Kind::Simple: return token::Simple{static_cast<uint8_t>(argument)};
-  case Kind::Float : return token::Float{argument};
-  case Kind::Break : return token::Break{};
-  default: abort();
-  }
 }
 
 auto make_token(Kind kind, std::uint64_t argument = 0,
                 std::vector<std::byte> payload = {}) -> ScanResult {
   return scan_result::Complete{
       scan_state::Head{},
-      make_token_(kind, argument, std::move(payload)),
+      Token::make(kind, argument, std::move(payload)),
   };
 }
 

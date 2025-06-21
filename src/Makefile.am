@@ -38,7 +38,7 @@ libglvi_cbor_la_HEADERS = \
     glvi_cbor_uint.h \
     glvi_cbor_value.h
 
-nodist_libglvi_cbor_la_SOURCES = glvi_cbor_token.h
+nodist_libglvi_cbor_la_SOURCES = glvi_cbor_token.cpp glvi_cbor_token.h
 
 EXTRA_DIST = token.def token.tpl
 

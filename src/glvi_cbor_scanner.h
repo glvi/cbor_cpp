@@ -19,19 +19,39 @@
 
 namespace scan_error {
 
-  struct UnexpectedEof {};
+  /**
+     This error indicates that the scanner encountered an unspecified
+     byte in head position.
 
+     An unspecified byte is one that does not contain a valid
+     combination of CBOR major type and argument.
+   */
   struct UnexpectedHead {
     std::byte head;
   };
 
+  /**
+     This error indicates that the scanner encountered an excessive count.
+
+     When one of the definite-length major types -- that is byte
+     string, text string, array, or map -- is specified as having a
+     count value larger than a hard-coded maximum.
+
+     ```c++
+     auto max_count = std::numeric_limits<std::size_t>::max();
+     ```
+   */
   struct Excessive {
-    std::uint64_t count;
+    std::size_t count;
   };
 
-  using ScanError = std::variant<UnexpectedEof, UnexpectedHead, Excessive>;
+  /**
+     Errors that can occur during scanning
+   */
+  using ScanError = std::variant<UnexpectedHead, Excessive>;
 } // namespace scan_error
 
+/// @copydoc scan_error::ScanError
 using scan_error::ScanError;
 
 namespace scan_state {
