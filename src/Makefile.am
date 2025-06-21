@@ -42,12 +42,12 @@ nodist_libglvi_cbor_la_SOURCES = glvi_cbor_token.cpp glvi_cbor_token.h
 
 EXTRA_DIST = token.def token.tpl
 
-glvi_cbor_token.h: $(srcdir)/token.def $(srcdir)/token.tpl
+glvi_cbor_token.h glvi_cbor_token.cpp: $(srcdir)/token.def $(srcdir)/token.tpl
 	$(AUTOGEN) -bglvi_cbor_token -T$(srcdir)/token.tpl --writable $(srcdir)/token.def
 
-BUILT_SOURCES = glvi_cbor_token.h
+BUILT_SOURCES = glvi_cbor_token.cpp glvi_cbor_token.h
 
-CLEANFILES = glvi_cbor_token.h
+CLEANFILES = glvi_cbor_token.cpp glvi_cbor_token.h
 
 check_PROGRAMS = \
     glvi_cbor_bstr_tests \
