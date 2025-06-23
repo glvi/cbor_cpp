@@ -95,6 +95,14 @@ dnl (empty)
 dnl ********************************************************************
 
 dnl ********************************************************************
+dnl checks for other stuff
+GLVI_CBOR_ARG_ENABLE_BSTR_COUNT_MAX
+GLVI_CBOR_ARG_ENABLE_TSTR_COUNT_MAX
+GLVI_CBOR_ARG_ENABLE_ARRAY_COUNT_MAX
+GLVI_CBOR_ARG_ENABLE_MAP_COUNT_MAX
+dnl ********************************************************************
+
+dnl ********************************************************************
 dnl Emit configuration
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

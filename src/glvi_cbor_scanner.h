@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
+#include "config.h"
 #include "glvi_cbor_token.h"
 
 /**
@@ -52,6 +53,7 @@ namespace scan_error {
      Errors that can occur during scanning
    */
   using ScanError = std::variant<UnexpectedHead, Excessive>;
+
 } // namespace scan_error
 
 /// @copydoc scan_error::ScanError
@@ -59,6 +61,54 @@ using scan_error::ScanError;
 
 /// Internal states of the lexical scanner
 namespace scan_state {
+
+  /**
+     Limits the maximum number of bytes in a CBOR byte string.
+
+     Settings this to any number > 0 will cause the scanner to reject
+     `BSTR` tokens whose argument exceeds this value.
+   */
+#if defined(GLVI_CBOR_BSTR_COUNT_MAX) && GLVI_CBOR_BSTR_COUNT_MAX > 0
+  static std::size_t bstr_count_max = GLVI_CBOR_BSTR_COUNT_MAX;
+#else
+  static std::size_t bstr_count_max = std::numeric_limits<std::size_t>::max();
+#endif
+
+  /**
+     Limits the maximum number of bytes in a CBOR byte string.
+
+     Settings this to any number > 0 will cause the scanner to reject
+     `TSTR` tokens whose argument exceeds this value.
+   */
+#if defined(GLVI_CBOR_TSTR_COUNT_MAX) && GLVI_CBOR_TSTR_COUNT_MAX > 0
+  static std::size_t tstr_count_max = GLVI_CBOR_TSTR_COUNT_MAX;
+#else
+  static std::size_t tstr_count_max = std::numeric_limits<std::size_t>::max();
+#endif
+
+  /**
+     Limits the maximum number of entries for CBOR arrays.
+
+     Settings this to any number > 0 will cause the scanner to reject
+     `Array` tokens whose argument exceeds this value.
+   */
+#if defined(GLVI_CBOR_ARRAY_COUNT_MAX) && GLVI_CBOR_ARRAY_COUNT_MAX > 0
+  static std::size_t array_count_max = GLVI_CBOR_ARRAY_COUNT_MAX;
+#else
+  static std::size_t array_count_max = std::numeric_limits<std::size_t>::max();
+#endif
+
+  /**
+     Limits the maximum number of entries for CBOR maps.
+
+     Settings this to any number > 0 will cause the scanner to reject
+     `Map` tokens whose argument exceeds this value.
+   */
+#if defined(GLVI_CBOR_MAP_COUNT_MAX) && GLVI_CBOR_MAP_COUNT_MAX > 0
+  static std::size_t map_count_max = GLVI_CBOR_MAP_COUNT_MAX;
+#else
+  static std::size_t map_count_max = std::numeric_limits<std::size_t>::max();
+#endif
 
   /**
      Expecting the next byte in "head" position

@@ -183,6 +183,7 @@ auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult {
       }
     }
     auto operator()(scan_state::Arg&& arg) -> ScanResult {
+      using common_type = std::common_type_t<std::uint64_t, std::size_t>;
       arg.arg <<= 8;
       arg.arg |= std::uint64_t(byte);
       arg.pending -= 1;
@@ -193,8 +194,31 @@ auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult {
       } else {
         switch (arg.kind) {
         case Kind::Bstr:
-        case Kind::Tstr: return gather_bytes(arg.kind, arg.arg);
-        default        : return make_token(arg.kind, arg.arg);
+          if ((common_type)arg.arg <= (common_type)scan_state::bstr_count_max) {
+	    return gather_bytes(arg.kind, arg.arg);
+	  } else {
+            return scan_error::Excessive {arg.arg};
+	  }
+        case Kind::Tstr:
+          if ((common_type)arg.arg <= (common_type)scan_state::tstr_count_max) {
+	    return gather_bytes(arg.kind, arg.arg);
+	  } else {
+            return scan_error::Excessive {arg.arg};
+	  }
+	case Kind::Array:
+          if ((common_type)arg.arg <= (common_type)scan_state::array_count_max) {
+            return make_token(arg.kind, arg.arg);
+          } else {
+            return scan_error::Excessive {arg.arg};
+          }
+	case Kind::Map:
+          if ((common_type)arg.arg <= (common_type)scan_state::map_count_max) {
+            return make_token(arg.kind, arg.arg);
+          } else {
+            return scan_error::Excessive {arg.arg};
+          }
+        default:
+	  return make_token(arg.kind, arg.arg);
         }
       }
     }

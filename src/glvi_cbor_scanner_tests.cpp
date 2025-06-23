@@ -19,8 +19,15 @@
 #include <cstdint>
 #include <dejagnu.h>
 #include <initializer_list>
-#include <ranges>
 #include <source_location>
+#include <variant>
+
+namespace {
+  template <typename... Ts> struct adhoc : Ts... {
+    using Ts::operator()...;
+  };
+  template <typename... Ts> adhoc(Ts...) -> adhoc<Ts...>;
+} // namespace
 
 using namespace std::string_literals;
 
@@ -35,12 +42,35 @@ using vec_u8 = std::vector<std::uint8_t>;
 using vec_byte = std::vector<std::byte>;
 
 class CBORScannerTests : TestState, std::source_location {
+  enum class test { passed, failed };
+
   unsigned numFailed_ = 0;
 
   void fail(std::string msg) {
     TestState::fail(std::move(msg));
     numFailed_++;
   }
+
+  template <typename Extractor, typename Expected> struct ResultHandler {
+    CBORScannerTests *tests;
+    std::source_location loc;
+    Extractor extract;
+    Expected expected;
+    auto operator()(scan_result::Complete&& complete) -> test {
+    }
+    auto operator()(scan_result::Incomplete&& incomplete) -> test {
+    }
+    auto operator()(ScanError&& error) -> test {
+    }
+    [[noreturn]] auto operator()(auto&&) -> test {
+      note("Unknown scan result variant.");
+      ::abort();
+    }
+  };
+
+  template <typename Extractor, typename Expected>
+  ResultHandler(CBORScannerTests *, std::source_location, Extractor&&,
+                Expected&&) -> ResultHandler<Extractor, Expected>;
 
   template <typename Assessor>
   auto expect(std::source_location loc, Assessor assess, vec_u8 from) noexcept
@@ -56,16 +86,41 @@ class CBORScannerTests : TestState, std::source_location {
   }
 
   template <typename Extractor, typename Expected>
-  auto expect(std::source_location loc, Extractor extract, Expected expected,
-              vec_u8 from) noexcept try {
-    auto result = scan(ScanState{}, std::move(from));
-    auto [_, token] = result.as_complete().value();
-    if ((token.*extract)().value() == expected) {
-      return pass(loc.function_name());
-    }
-    return fail(loc.function_name());
+  auto expect(std::source_location loc, Extractor&& extract,
+              Expected&& expected, vec_u8 from) noexcept try {
+    visit(adhoc{
+              [&](scan_result::Complete&& complete) {
+                auto [_, token] = complete;
+                if ((token.*extract)().value() == expected) {
+                  pass(loc.function_name());
+                } else {
+                  fail(loc.function_name());
+                }
+              },
+              [&](scan_result::Incomplete&&) {
+                note("Scanner returned prematurely");
+                fail(loc.function_name());
+              },
+              [&](ScanError&& error) {
+                std::visit(
+                    adhoc{
+                        [&](scan_error::UnexpectedHead&& info) {
+                          note("Scanner returned unexpected head (0x%02x)",
+                               info.head);
+                        },
+                        [&](scan_error::Excessive&& info) {
+                          note("Scanner returned excessive count (%d)",
+                               info.count);
+                        },
+                    },
+                    std::move(error));
+                fail(loc.function_name());
+              },
+              [](auto&&) -> void {},
+          },
+          scan(ScanState{}, std::move(from)));
   } catch (...) {
-    return fail(loc.function_name());
+    fail(loc.function_name());
   }
 
   inline auto expect_uint(std::source_location loc, std::uint64_t expected,
