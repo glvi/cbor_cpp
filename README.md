@@ -1,6 +1,16 @@
 [![C++ build](https://github.com/glvi/cbor_cpp/actions/workflows/cpp.yaml/badge.svg)](https://github.com/glvi/cbor_cpp/actions/workflows/cpp.yaml)
 # cbor_cpp
-C++ library for decoding Concise Binary Object Representation
+C++ library for decoding Concise Binary Object Representation (CBOR).
+
+Concise Binary Object Representation is an Internet Standard, see [STD94] below.
+
+<dl>
+  <dt>[STD94]</a></dt>
+  <dd>
+    <p>Internet Standard 94, &lt;https://www.rfc-editor.org/info/std94&gt;. At the time of writing, this STD comprises the following:</p>
+    <p>Bormann, C. and P. Hoffman, "Concise Binary Object Representation (CBOR)", STD 94, RFC 8949, DOI 10.17487/RFC8949, December 2020, &lt;https://www.rfc-editor.org/info/rfc8949&gt;.</p>
+  </dd>
+</dl>
 
 ## Tested on
 
