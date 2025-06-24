@@ -41,3 +41,18 @@ compiler flags.
 Modify `CPPFLAGS` accordingly, if your installation of DejaGnu resides
 in a different location, or if you want to specify additional
 preprocessor flags.
+
+## Information security
+
+The scanner has protection against excessive counts of bytes in byte
+strings or text strings, or excessive counts of elements in arrays or
+maps. These counts can be changed at the level of the `configure`
+script. See `configure --help` for options
+`--enable-cbor-bstr/tstr/array/map-count-max`. Default values are as follows.
+
+Type  | Max   | Unit
+:-----|------:|:------------------
+bstr  | 32768 | bytes
+tstr  | 32768 | bytes
+array |  1024 | elements
+map   |   512 | pairs of elements
