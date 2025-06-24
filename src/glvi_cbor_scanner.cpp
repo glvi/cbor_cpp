@@ -16,9 +16,12 @@
 //  along with this program. If not, see <https://www.gnu.org/licenses/>.
 #include "glvi_cbor_scanner.h"
 #include "glvi_cbor_scanner_helper.h"
+#include <concepts>
 #include <cstdlib>
 #include <expected>
+#include <limits>
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 auto unexpected_head_error(std::byte octet) -> ScanResult {
@@ -91,6 +94,24 @@ auto token_simple(std::uint64_t arg) -> ScanResult {
 
 auto token_break() -> ScanResult {
   return make_token(Kind::Break, 0xff);
+}
+
+template <std::unsigned_integral A, std::unsigned_integral B>
+auto protect_size(A a, B b) -> std::optional<scan_error::Excessive> {
+  using C = std::common_type_t<A, B>;
+  if (static_cast<C>(a) <= static_cast<C>(b))
+    return std::nullopt;
+  return {{a}};
+}
+
+auto count_max(Kind kind) -> std::size_t {
+  switch (kind) {
+  case Kind::Bstr : return scan_state::bstr_count_max;
+  case Kind::Tstr : return scan_state::tstr_count_max;
+  case Kind::Array: return scan_state::array_count_max;
+  case Kind::Map  : return scan_state::map_count_max;
+  default         : return std::numeric_limits<std::size_t>::max();
+  }
 }
 
 struct Argc {
@@ -183,42 +204,20 @@ auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult {
       }
     }
     auto operator()(scan_state::Arg&& arg) -> ScanResult {
-      using common_type = std::common_type_t<std::uint64_t, std::size_t>;
       arg.arg <<= 8;
       arg.arg |= std::uint64_t(byte);
       arg.pending -= 1;
       if (arg.pending > 0) {
         return scan_result::Incomplete{std::move(arg)};
       } else if (arg.arg == 0) {
-	return make_token(arg.kind);
+        return make_token(arg.kind);
       } else {
+        if (auto opt_err = protect_size(arg.arg, count_max(arg.kind)))
+          return *std::move(opt_err);
         switch (arg.kind) {
         case Kind::Bstr:
-          if ((common_type)arg.arg <= (common_type)scan_state::bstr_count_max) {
-	    return gather_bytes(arg.kind, arg.arg);
-	  } else {
-            return scan_error::Excessive {arg.arg};
-	  }
-        case Kind::Tstr:
-          if ((common_type)arg.arg <= (common_type)scan_state::tstr_count_max) {
-	    return gather_bytes(arg.kind, arg.arg);
-	  } else {
-            return scan_error::Excessive {arg.arg};
-	  }
-	case Kind::Array:
-          if ((common_type)arg.arg <= (common_type)scan_state::array_count_max) {
-            return make_token(arg.kind, arg.arg);
-          } else {
-            return scan_error::Excessive {arg.arg};
-          }
-	case Kind::Map:
-          if ((common_type)arg.arg <= (common_type)scan_state::map_count_max) {
-            return make_token(arg.kind, arg.arg);
-          } else {
-            return scan_error::Excessive {arg.arg};
-          }
-        default:
-	  return make_token(arg.kind, arg.arg);
+        case Kind::Tstr: return gather_bytes(arg.kind, arg.arg);
+        default        : return make_token(arg.kind, arg.arg);
         }
       }
     }
@@ -245,22 +244,26 @@ auto scan(ScanState&& state, std::uint8_t byte) -> ScanResult {
 struct Scanner {
   ScanState state;
 
-  auto scan(std::uint8_t octet) -> std::expected<std::optional<Token>, ScanError> {
+  auto scan(std::uint8_t octet)
+      -> std::expected<std::optional<Token>, ScanError> {
     auto scan_result = ::scan(std::move(state), octet);
     struct ResultProcessor {
       ScanState& state;
-      auto operator()(scan_result::Incomplete&& i) -> std::expected<std::optional<Token>, ScanError> {
-	state = std::move(i.state);
-	return std::nullopt;
+      auto operator()(scan_result::Incomplete&& i)
+          -> std::expected<std::optional<Token>, ScanError> {
+        state = std::move(i.state);
+        return std::nullopt;
       }
-      auto operator()(scan_result::Complete&& c) -> std::expected<std::optional<Token>, ScanError> {
-	state = std::move(c.state);
-	return std::optional {std::move(c.token)};
+      auto operator()(scan_result::Complete&& c)
+          -> std::expected<std::optional<Token>, ScanError> {
+        state = std::move(c.state);
+        return std::optional{std::move(c.token)};
       }
-      auto operator()(ScanError&& e) -> std::expected<std::optional<Token>, ScanError> {
+      auto operator()(ScanError&& e)
+          -> std::expected<std::optional<Token>, ScanError> {
         return std::unexpected(std::move(e));
       }
     };
-    return visit(ResultProcessor {state}, std::move(scan_result));
+    return visit(ResultProcessor{state}, std::move(scan_result));
   }
 };
