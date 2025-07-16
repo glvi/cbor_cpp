@@ -76,3 +76,5 @@ public:
    */
   auto &operator[](size_type const i) noexcept { return storage[i]; }
 };
+
+constexpr CBORBstr const CBOR_Nil{};
