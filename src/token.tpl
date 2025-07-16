@@ -21,6 +21,7 @@
 [+ CASE (suffix) +][+ == h +]#pragma once
 #include <cstdint>
 #include <expected>
+#include <string>
 #include <utility>
 #include <vector>
 #include <variant>
@@ -78,6 +79,10 @@ public:
   }
 
   Token() = delete;
+
+  constexpr auto kind() const noexcept -> Kind {
+    return token::kind(token);
+  }
   [+ FOR token +]
   constexpr auto is_[+ (string-downcase! (get "kind")) +]() noexcept -> bool {
     return holds<token::[+ kind +]>();
@@ -88,6 +93,15 @@ public:
     return std::unexpected(token::error::Not[+kind+]{});
   }
   [+ ENDIF +][+ ENDFOR token +]
+  template<typename Visitor>
+  constexpr auto visit(Visitor&& visitor) && {
+    return std::visit(std::forward<Visitor>(visitor), std::move(token));
+  }
+
+  template<typename Visitor>
+  constexpr auto visit(Visitor&& visitor) const& {
+    return std::visit(std::forward<Visitor>(visitor), token);
+  }
 };
 
 [+ == cpp +]#include "glvi_cbor_token.h"
@@ -104,6 +118,7 @@ auto Token::make(Kind kind, std::uint64_t argument, std::vector<std::byte> paylo
   CASE value_type +]
   [+ == "std::uint64_t" +]case Kind::[+kind+]: return token::[+kind+]{argument};
   [+ == "std::uint8_t" +]case Kind::[+kind+]: return token::[+kind+]{static_cast<std::uint8_t>(argument)};
+  [+ == "std::u8string" +]case Kind::[+kind+]: return token::[+kind+]{std::u8string{(char8_t*)payload.data(), payload.size()}};
   [+ ~~* "std::vector" +]case Kind::[+kind+]: return token::[+kind+]{std::move(payload)};
   [+ !E +]case Kind::[+kind+]: return token::[+kind+]{};
   [+ ESAC +][+ ENDFOR token +]}
