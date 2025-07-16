@@ -17,6 +17,7 @@ libglvi_cbor_la_SOURCES = \
     glvi_cbor_float.cpp \
     glvi_cbor_value.cpp \
     glvi_cbor_scanner.cpp \
+    glvi_cbor_parser.cpp \
     $(libglvi_cbor_la_HEADERS)
 
 libglvi_cbor_ladir = $(includeDir)
@@ -29,6 +30,7 @@ libglvi_cbor_la_HEADERS = \
     glvi_cbor_int.h \
     glvi_cbor_map.h \
     glvi_cbor_nint.h \
+    glvi_cbor_parser.h \
     glvi_cbor_scanner_helper.h \
     glvi_cbor_scanner.h \
     glvi_cbor_simple.h \
@@ -53,11 +55,13 @@ check_PROGRAMS = \
     glvi_cbor_bstr_tests \
     glvi_cbor_tstr_tests \
     glvi_cbor_value_tests \
-    glvi_cbor_scanner_tests
+    glvi_cbor_scanner_tests \
+    glvi_cbor_parser_tests
 
 glvi_cbor_bstr_tests_LDADD = -lglvi_cbor
 glvi_cbor_tstr_tests_LDADD = -lglvi_cbor
 glvi_cbor_value_tests_LDADD = -lglvi_cbor
 glvi_cbor_scanner_tests_LDADD = -lglvi_cbor
+glvi_cbor_parser_tests_LDADD = -lglvi_cbor
 
 TESTS = $(check_PROGRAMS)
