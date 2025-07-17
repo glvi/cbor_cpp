@@ -23,6 +23,41 @@ namespace {
   template <typename... Ts> adhoc(Ts...) -> adhoc<Ts...>;
 } // namespace
 
+auto to_u8string(ParseError const& e) -> std::u8string {
+  return std::visit(
+      adhoc{
+          [](parse_error::Invalid const&) -> std::u8string {
+            return u8"Invalid";
+          },
+          [](parse_error::Incomplete const&) -> std::u8string {
+            return u8"Incomplete";
+          },
+          [](parse_error::UnexpectedT const&) -> std::u8string {
+            return u8"Unexpected terminal";
+          },
+          [](parse_error::UnexpectedNT const&) -> std::u8string {
+            return u8"Unexpected non-terminal";
+          },
+          [](parse_error::Unexpected const&) -> std::u8string {
+            return u8"Unexpected";
+          },
+          [](parse_error::TrailingInput const&) -> std::u8string {
+            return u8"Trailing input";
+          },
+          [](parse_error::Scanner const&) -> std::u8string {
+            return u8"Scanner";
+          },
+          [](parse_error::InsufficientStackSize const&) -> std::u8string {
+            return u8"Insufficient stack size";
+          },
+          [](parse_error::Internal const&) -> std::u8string {
+            return u8"Internal";
+          },
+          [](parse_error::Todo const&) -> std::u8string { return u8"Todo"; },
+      },
+      e.e);
+}
+
 namespace parse_state {
   static auto do_flush(ValueStack& valStack, ContextStack& cxtStack)
       -> std::expected<void, ParseError>;

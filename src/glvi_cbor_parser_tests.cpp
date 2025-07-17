@@ -69,7 +69,7 @@ public:
                 fail(loc.function_name());
               },
               [&](ParseError&& error) -> void {
-		note("Error");
+		note("Parse error: %s", to_u8string(error).c_str());
                 fail(loc.function_name());
               },
           },
@@ -94,7 +94,7 @@ public:
                 fail(loc.function_name());
               },
               [&](ParseError&& error) -> void {
-		note("Error");
+		note("Parse error: %s", to_u8string(error).c_str());
                 fail(loc.function_name());
               },
           },
@@ -119,7 +119,7 @@ public:
                 fail(loc.function_name());
               },
               [&](ParseError&& error) -> void {
-		note("Error");
+		note("Parse error: %s", to_u8string(error).c_str());
                 fail(loc.function_name());
               },
           },

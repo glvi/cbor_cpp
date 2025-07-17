@@ -183,6 +183,8 @@ public:
   constexpr auto visit(this Self&& self, Visitor&& visitor) {
     return std::visit(std::forward<Visitor>(visitor), std::forward<Self>(self));
   }
+
+  friend auto to_u8string(ParseError const& e) -> std::u8string;
 };
 
 namespace parse_state {
