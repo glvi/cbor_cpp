@@ -57,10 +57,13 @@ class CBORScannerTests : TestState, std::source_location {
     Extractor extract;
     Expected expected;
     auto operator()(scan_result::Complete&& complete) -> test {
+      return test::failed;
     }
     auto operator()(scan_result::Incomplete&& incomplete) -> test {
+      return test::failed;
     }
     auto operator()(ScanError&& error) -> test {
+      return test::failed;
     }
     [[noreturn]] auto operator()(auto&&) -> test {
       note("Unknown scan result variant.");
