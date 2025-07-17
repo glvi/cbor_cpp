@@ -119,7 +119,6 @@ class CBORScannerTests : TestState, std::source_location {
                     std::move(error));
                 fail(loc.function_name());
               },
-              [](auto&&) -> void {},
           },
           scan(ScanState{}, std::move(from)));
   } catch (...) {
