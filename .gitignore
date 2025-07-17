@@ -36,9 +36,9 @@
 
 # Administrative stuff
 autom4te.cache/
-build/
-build-debug/
-build-release/
+*build/
+*build-debug/
+*build-release/
 Makefile.in
 aclocal.m4
 ar-lib
